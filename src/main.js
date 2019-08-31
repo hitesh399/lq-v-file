@@ -1,8 +1,9 @@
-import Vue from 'vue'
-import App from './App.vue'
+import LqVFile from  './components/LqVFile'
 
-Vue.config.productionTip = false
-
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+export default {
+  // The install method will be called with the Vue constructor as
+  // the first argument, along with possible options
+  install (Vue, options) {
+    Vue.component('lq-v-file', LqVFile)
+  }
+}
