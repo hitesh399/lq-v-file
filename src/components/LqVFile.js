@@ -86,6 +86,36 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
+        deleteIcon: {
+            type: String,
+            default: () => 'fa-trash'
+        },
+        changeIcon: {
+            type: String,
+            default: () => 'fa-file'
+        },
+        cropIcon: {
+            type: String,
+            default: () => 'fa-crop'
+        },
+        addIcon: {
+            type: String,
+            default: () => 'fa-plus'
+        },
+        layoutTag: {
+            type: String,
+            default: () => 'v-layout'
+        },
+        layoutProps: {
+            type: Object,
+            default: () => {
+                return {
+                    row: true,
+                    wrap: true,
+                    'fill-height': true,
+                }
+            }
+        }
     },
     data () {
         return {
@@ -128,7 +158,6 @@ export default Vue.extend({
             if (this.popupHeight <= this.thumb.height) {
                 let newHeight  = (this.popupHeight - 20);
                 let newWidth = this.thumb.width/this.thumb.height * newHeight
-                console.log('newWidth', newWidth)
                 return {
                   width: newWidth,
                   height: newHeight
@@ -153,28 +182,15 @@ export default Vue.extend({
             },
             [
                 this.genInputFile(),
-                // this.$createElement(
-                //     'v-container', 
-                //     {
-                //         gridListMd: true,
-                //         textXsCenter: true
-                //     },
-                //     [
-                        this.$createElement(
-                            'v-layout',
-                            {
-                                attrs: {
-                                    row: true,
-                                    wrap: true,
-                                    'fill-height': true,
-                                }
-                            },
-                            items
-                        ),
-                        h('crop-dialog'),
-                        this.genMessages()
-                //     ]
-                // )
+                this.$createElement(
+                    this.layoutTag,
+                    {
+                        attrs: this.layoutProps
+                    },
+                    items
+                ),
+                h('crop-dialog'),
+                this.genMessages()
             ]
         )
     },
@@ -271,7 +287,7 @@ export default Vue.extend({
                         },
                        
                         [
-                            this.$createElement('v-icon', 'fa-plus')
+                            this.$createElement('v-icon', this.addIcon)
                         ]
                     )
                 ]
@@ -373,5 +389,5 @@ export default Vue.extend({
     },
     created () {
         this.$lqForm.addProp(this.formName, this.id, 'formatter', this.formatter)
-    },
+    }
 })

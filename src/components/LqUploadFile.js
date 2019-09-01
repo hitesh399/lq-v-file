@@ -43,6 +43,11 @@ export default Vue.extend({
         return this.genFile();
 
     },
+    data () {
+        return  {
+            uploading: false
+        }
+    },
     methods: {
         genFile () {
             console.log('this.$attrs', this.$attrs)
@@ -75,13 +80,10 @@ export default Vue.extend({
                             }
                         },
                         cropped: () => {
-                            const rules = this.$refs.lqfile.lqElRules
-                            if (!rules) {
-                                this.uploadFile();
-                            }
+                            this.uploadFile();
                         },
                         'element-validated': (validateStatus) => {
-                            !validateStatus ? this.uploadFile() : this.onLocalError()
+                            !validateStatus ? ( !this.thumb ? this.uploadFile() : null) : this.onLocalError(validateStatus)
                         }
                         
                     },
@@ -92,7 +94,9 @@ export default Vue.extend({
             )
         },
         uploadFile() {
+            if (this.uploading) {return false}
             this.$emit('uploading');
+            this.uploading = true
             const values = {[this.id]: this.$refs.lqfile.formatter()};
             let form = undefined;
             if (this.otherData) {
@@ -102,12 +106,15 @@ export default Vue.extend({
             this.$axios.post(this.action, formData)
                 .then((response) => {
                     this.$emit('server-success', response)
+                    this.uploading = false
                 }).catch((error) => {
                     this.$emit('server-error', error)
                     this.$refs.lqfile.setValue(null)
+                    this.uploading = false
                 })
         },
         onLocalError (error) {
+            console.log('I am done', error)
             this.$emit('local-error', error)
             this.$refs.lqfile.setValue(null)
         }

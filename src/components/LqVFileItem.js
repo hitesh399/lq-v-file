@@ -256,7 +256,7 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', 'fa-trash')
+                    this.$createElement('v-icon', this.lqFile.deleteIcon)
                 ]
             )
         },
@@ -290,7 +290,7 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', 'fa-file')
+                    this.$createElement('v-icon', this.lqFile.changeIcon)
                 ]
             )
         },
@@ -313,7 +313,7 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', 'fa-crop')
+                    this.$createElement('v-icon', this.lqFile.cropIcon)
                 ]
             )
         },
