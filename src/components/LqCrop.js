@@ -50,7 +50,7 @@ export default Vue.extend({
         return {
             loading: false,
             rawData: '',
-            target: this.fileIndex ? this.id + '.' + this.fileIndex : this.id,
+            target: this.fileIndex !== undefined ? this.id + '.' + this.fileIndex : this.id,
             file: this.fileObject.original
         }
     },
@@ -71,9 +71,7 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.rawData = e.target.result;
-                setTimeout(() => {
-                    this.initCrop()
-                }, 500)
+                this.initCrop()
             }
             fReader.readAsDataURL(this.file);
         },
@@ -106,7 +104,11 @@ export default Vue.extend({
                     elementName: this.target + '.cropped',
                     value: true
                 })
-                this.lqFileItem.readFile();
+                this.$store.dispatch('form/setElementValue', {
+                    formName: this.lqForm.name,
+                    elementName: this.target + '.uid',
+                    value: Date.now()
+                })
                 this.lqFile.validate();          
                 this.$emit('cropped', this.fileObject, this.fileIndex);
             });
@@ -140,6 +142,7 @@ export default Vue.extend({
                         viewport: this.viewport,
                         showZoomer: this.showZoomer,
                         enableResize: this.enableResize,
+                        
                         ...this.$attrs
                     }
                 }

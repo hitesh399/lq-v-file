@@ -10,19 +10,14 @@ export default Vue.extend({
         };
     },
     props: {
-        fileObject: {
-            type: Object,
-            required: true
-        },
-        showChange: {
+        hideDetails: {
             type: Boolean,
-            default: () => true
+            default: () => false
         },
         fileIndex: Number
     },
     data () {
         return {
-            showCropBox: false,
             loading: false,
             isImage: false,
             imageRawData: '',
@@ -32,11 +27,24 @@ export default Vue.extend({
     },
     
     computed: {
+        fileObject: function () {
+            return helper.getProp(
+                this.$store.state.form, 
+                `${this.lqFile.formName}.values.${this.fileId}`,
+                {}
+            );
+        },
         boxHeight() {
             return this.lqFile.boxHeight ? this.lqFile.boxHeight : 100;
         },
-        errors () {
-            let fileId = this.fileIndex ? `${this.lqFile.id}.${this.fileIndex}` : this.lqFile.id
+        fileId () {
+            return this.fileIndex !== undefined ? `${this.lqFile.id}.${this.fileIndex}` : this.lqFile.id
+        },
+        fileName () {
+           return this.file ? this.file.name : this.uploadedFileUrl.substring(this.uploadedFileUrl.lastIndexOf('/') +1 )
+        },
+        error () {
+            let fileId = this.fileId
             let fileObjectPath = [ this.lqForm.name, 'errors', fileId ]
             let filePath = [ this.lqForm.name, 'errors', fileId, 'file' ]
             const fileObjectError = this.$helper.getProp(
@@ -56,44 +64,42 @@ export default Vue.extend({
         },
         isCropped: function () {
             return helper.getProp(this.fileObject, 'cropped', null);
-          },
-          originalFile: function () {
+        },
+        originalFile: function () {
             return helper.getProp(this.fileObject, 'original', null);
-          },
-          file: function () {
+        },
+        uuid: function () {      
+            return helper.getProp(this.fileObject, 'uid', null);
+        },
+        file: function () {
             return this.fileObject ? this.fileObject.file : null;
-          },
-          isBlank: function () {
+        },
+        isBlank: function () {
             return !(this.file || this.uploadedFileUrl)
-          },
-          uploadedFileUrl: function () {
+        },
+        uploadedFileUrl: function () {
             return helper.getProp(this.fileObject, this.lqFile.valueKey, null);
-          },
-          previewImage: function () {
+        },
+        previewImage: function () {
             return this.imageRawData ? this.imageRawData : (this.uploadedFileUrl ? this.uploadedFileUrl : '')
-          },
-          viewport: function () {
+        },
+        viewport: function () {
             if (!this.lqFile.thumb) {
-              return false;
+                return false;
             }
             if (this.lqFile.popupHeight <= this.lqFile.thumb.height) {
                 let newHeight  = (this.lqFile.popupHeight - 20);
                 let newWidth = this.lqFile.thumb.width/this.lqFile.thumb.height * newHeight
                 return {
-                  width: newWidth,
-                  height: newHeight
+                    width: newWidth,
+                    height: newHeight
                 }
             }
             return this.lqFile.thumb;
-          }
-    },
-    created: function (){
-        this.readFile();
-        this.findUploadedFileType(this.uploadedFileUrl);
+        }
     },
     render(h) {
         if (this.isBlank) return;
-        console.log('I am here sjgdhs 1')
         const self = this;
         return h(
             'div',
@@ -101,37 +107,56 @@ export default Vue.extend({
                 class: {
                     item: true,
                     'elevation-5': true,
-                    'is-error': !!this.errors
+                    'is-error': !!this.error,
+                    ['unique-' + this.uuid] : true
                 },
                 style: {
-                    height: `${(this.boxHeight ? this.boxHeight : 100)}px`,
-                    cursor: this.isBlank ? 'pointer' : 'inherit'
+                    'min-height': `${(this.boxHeight ? this.boxHeight : 100)}px`,
+                    cursor: this.isBlank ? 'pointer' : 'inherit',
+                    position: 'relative'
                 }
             },
             [
                 this.$createElement(
-                    'v-hover',
+                    'v-layout', 
                     {
-                        scopedSlots: {
-                            default: function ({ hover }) {
-                                console.log('I am adjhsjdgsjgdjs 21')
-                                return self.genImageItem(hover)
+                        attrs: {
+                            'align-center': true,
+                            'justify-center': true,
+                            row: true,
+                            'fill-height': true,
+                            wrap: true
+                        },
+                        style: {
+                            margin: 0
+                        },
+                    },
+                    [
+                        this.$createElement(
+                            'v-hover',
+                            {
+                                scopedSlots: {
+                                    default: function ({ hover }) {
+                                        return self.isImage || self.uploadedFileType === 'image' ?  self.genImageItem(hover) : self.genFileItem(hover)
+                                    }
+                                }
                             }
-                        }
-                    }
+                        ),
+                        // self.isImage || self.uploadedFileType === 'image' ?  self.genImageItem(true) : self.genFileItem(true),
+                        this.genMessages()
+                    ]
                 )
             ]
         )
     },
     methods: {
         genImageItem (hover) {
-            console.log('I am here to do some...')
             return this.$createElement(
                 'v-img',
                 {
                     props: {
                         src: this.previewImage,
-                        aspectRatio: this.lqFile.aspectRatio,
+                        aspectRatio: this.lqFile.thumb ? this.lqFile.thumb.width/this.lqFile.thumb.height : this.lqFile.aspectRatio,
                         class: {
                             grey: true,
                             'lighten-2': true 
@@ -142,9 +167,43 @@ export default Vue.extend({
                     this.$createElement(
                         'v-expand-transition',
                         [
+                            this.lqFile.openBrowser === false && hover ? this.genHoverItem() : null
+                        ]
+                    )
+                ]
+            )
+        },
+        genFileItem(hover) {
+            return this.$createElement(
+                'div',
+                {
+                    class: {
+                        // 'text-truncate' : true
+                    },
+                    style: {
+                        width: '100%',
+                        padding: '10px',
+                        'word-break': 'break-all'
+                    }
+                },
+                [
+                    this.$createElement(
+                        'div',
+                        [
                             this.$createElement(
-                                'div',
-                                [ this.lqFile.openBrowser === false && hover ? this.genHoverItem() : null]
+                                'span',
+                                {
+                                    class: {
+                                        // 'text-truncate' : true
+                                    }
+                                },
+                                this.fileName
+                            ),
+                            this.$createElement(
+                                'v-expand-transition',
+                                [
+                                    this.lqFile.openBrowser === false && hover ? this.genHoverItem() : null
+                                ]
                             )
                         ]
                     )
@@ -152,36 +211,32 @@ export default Vue.extend({
             )
         },
         genHoverItem () {
-            console.log('I am mouse hover Item here')
             return this.$createElement(
-                'div',
+                'v-layout',
                 {
                     class: {
-                        'd-flex': true,
                         'transition-fast-in-fast-out': true,
                         'backdrop': true,
-                        'fill-height': true
+                    },
+                    style: {
+                        margin: 0,
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%'
                     },
                     attrs: {
-                        title: this.errors
+                        'align-center': true,
+                        'justify-center': true,
+                        column: true,
+                        'fill-height': true,
+                        wrap: true
                     }
                 },
                 [
-                    this.$createElement(
-                        'v-layout',
-                        {
-                            props: {
-                                alignCenter: true,
-                                justifyCenter: true,
-                                column: true
-                            }
-                        },
-                        [
-                            this.genDeleteBtn(),
-                            this.genChangeBtn(),
-                            this.genCropBtn(),
-                        ]
-                    )
+                    this.genDeleteBtn(),
+                    !this.lqFile.multiple ? this.genChangeBtn() : null,
+                    this.genCropBtn(),
                 ]
             )
         },
@@ -201,10 +256,23 @@ export default Vue.extend({
                     }
                 },
                 [
-                    // this.$createElement('v-icon', 'fa-trash')
-                    'Delete'
+                    this.$createElement('v-icon', 'fa-trash')
                 ]
             )
+        },
+        genMessages () {
+            if (this.hideDetails) return null
+            if (this.error) {
+                return this.$createElement(
+                    'v-messages',
+                    {
+                        props: {
+                            value: [this.error], 
+                            color: 'error' 
+                        }
+                    }
+                )
+            }
         },
         genChangeBtn () {
             const self = this;
@@ -217,13 +285,12 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            self.$emit('change', self.fileObject, self.fileIndex)
+                            self.$emit('open-window', self.fileObject, self.fileIndex)
                         }
                     }
                 },
                 [
-                    // this.$createElement('v-icon', 'fa-file')
-                    'Change'
+                    this.$createElement('v-icon', 'fa-file')
                 ]
             )
         },
@@ -241,18 +308,16 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            // self.showCropBox = true;
-                            self.$emit('showCropper', this.fileObject, this.fileIndex)
+                            self.$emit('open-cropper', self.fileObject, self.fileIndex)
                         }
                     }
                 },
                 [
-                    // this.$createElement('v-icon', 'fa-crop')
-                    'Crop'
+                    this.$createElement('v-icon', 'fa-crop')
                 ]
             )
         },
-        readFile() {
+        readFile(showCroped = true) {
             if (!this.file) {
             return;
             }
@@ -260,8 +325,8 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.isImage  =  isImage(e.target.result) ? true : false;
-                if (this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
-                    this.$emit('showCropper', this.fileObject, this.fileIndex)
+                if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
+                    this.$emit('open-cropper', this.fileObject, this.fileIndex)
                 }
                 this.loading = false;
                 this.imageRawData = e.target.result;
@@ -286,11 +351,20 @@ export default Vue.extend({
         }
     },
     watch: {
-        fileObject: function (newFile, oldFile) {
-          !oldFile || !newFile || newFile.uid !==  oldFile.uid ? this.readFile() : null;
+        uuid:{
+            handler: function (newUid, olduid) {
+                if (newUid !== olduid) {
+                    this.readFile()
+                }
+            },
+            deep: true,
+            immediate: true
         },
-        uploadedFileUrl: function (newUrl, oldUrl) {
-          this.findUploadedFileType(newUrl);
+        uploadedFileUrl: {
+            handler: function (newUrl) {
+                this.findUploadedFileType(newUrl);
+            },
+            immediate: true
         }
     },
 })

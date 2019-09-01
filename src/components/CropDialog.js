@@ -7,15 +7,43 @@ export default Vue.extend({
     components: {
         LqCrop
     },
+    data() {
+        return {
+            actionAreaWidth: 0
+        }
+    },
     computed: {
         dialog () {
             return this.lqFile.showCropBox
+        },
+        getViewPort () {
+            let viewPort = {...this.getBoundary}
+            viewPort.width = viewPort.width - 20;
+            viewPort.height = viewPort.height - 20;
+            return viewPort
+        },
+        getBoundary() {
+            let viewPort = {...this.lqFile.viewport};
+            if (viewPort.width > this.actionAreaWidth) {
+                const newWidth  = this.actionAreaWidth
+                const aspectRatio =  ( this.lqFile.thumb.width /  this.lqFile.thumb.height )
+                const newHeight = ( newWidth / aspectRatio )
+                viewPort.height = newHeight
+                viewPort.width = newWidth
+            }
+            return viewPort;
         }
+    },
+    updated () {
+        // console.log('CardText', this.$refs.CardText.offsetWidth)
+        this.actionAreaWidth = this.$refs.CardText ? this.$refs.CardText.offsetWidth : this.lqFile.thumb.width
     },
     render(h) {
         if (!this.dialog) {
             return null;
         }
+        // console.log(this.getBoundary, 'Boundary')
+        const self = this;
         return h(
             'v-dialog', 
             {
@@ -41,7 +69,8 @@ export default Vue.extend({
                                     {
                                         style: {
                                             height: `${this.lqFile.popupHeight}px`
-                                        }
+                                        },
+                                        ref: 'CardText'
                                     },
                                     [
                                         h(
@@ -51,12 +80,44 @@ export default Vue.extend({
                                                     id: this.lqFile.id,
                                                     fileIndex: this.lqFile.fileIndexToCrop,
                                                     fileObject: this.lqFile.fileObjectToCrop,
-                                                    viewport: this.lqFile.viewport,
-                                                    size: this.lqFile.thumbSize
-                                                }
+                                                    viewport: this.getViewPort,
+                                                    size: this.lqFile.thumbSize,
+                                                    enableResize: this.lqFile.enableResize
+                                                },
+                                                attrs: {
+                                                    boundary: this.getBoundary,
+                                                },
+                                                on: {
+                                                    cropped() {
+                                                        self.lqFile.onHideCropBox()
+                                                    }
+                                                },
+                                                ref: 'cropper'
                                             }
                                         )
                                     ]
+                                )
+                            ]
+                        ),
+                        h(
+                            'v-card-actions',
+                            [
+                                h('v-spacer'),
+                                h(
+                                    'v-btn',
+                                    {
+                                        props: {
+                                            color: 'green darken-1',
+                                            flat: true
+                                        },
+                                        on: {
+                                            click(event) {
+                                                event.stopPropagation()
+                                                self.$refs.cropper.cropImage()
+                                            }
+                                        }
+                                    },
+                                    'Crop'
                                 )
                             ]
                         )

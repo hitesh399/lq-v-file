@@ -3,6 +3,7 @@ import {lqFileMixin, lqPermissionMixin, lqElementMixin} from 'lq-form';
 import  helper from 'vuejs-object-helper';
 import FileItem from './LqVFileItem'
 import CropDialog from './CropDialog'
+import validate from 'validate.js'
 
 export default Vue.extend({
     name: 'lq-v-file',
@@ -60,7 +61,31 @@ export default Vue.extend({
             default: () => {
                 return {'xs12': true, 'md12': true }
             }
-        }
+        },
+        itemLocation: {
+            type: String,
+            default: () => 'prepend'
+        },
+        hideDetails: {
+            type: Boolean,
+            default: () => false
+        },
+        hideItemError: {
+            type: Boolean,
+            default: () => false
+        },
+        errorCount: {
+            type: Number,
+            default: () => 1
+        },
+        enableResize: {
+            type: Boolean,
+            default: () => false
+        },
+        showSelectedFile: {
+            type: Boolean,
+            default: () => true
+        },
     },
     data () {
         return {
@@ -80,6 +105,12 @@ export default Vue.extend({
                 return false;
             }
         },
+        validations () {
+            return this.errors.slice(0, Number(this.errorCount))
+        },
+        hasItem () {
+            return !validate.isEmpty(this.fileObject)
+        },
         maxNoOfFiles: function () {
             return this.$helper.getProp(this.lqElRules, 'file.max');
         },
@@ -97,18 +128,21 @@ export default Vue.extend({
             if (this.popupHeight <= this.thumb.height) {
                 let newHeight  = (this.popupHeight - 20);
                 let newWidth = this.thumb.width/this.thumb.height * newHeight
+                console.log('newWidth', newWidth)
                 return {
                   width: newWidth,
                   height: newHeight
                 }
             }
-            return this.lqFile.thumb;
-          },
+            return this.thumb;
+        },
     },
     render (h) {
-        const items = [
-            this.showAddBtn ? this.renderDefaultSlot() : null
-        ].concat(this.renderItems())
+        const addBtn = [
+            this.showAddBtn || !this.showSelectedFile ? this.renderDefaultSlot() : null
+        ];
+        const fileItems = this.renderItems();
+        const items = this.itemLocation === 'prepend' ? fileItems.concat(addBtn) : addBtn.concat(fileItems)
 
         return h(
             'div', 
@@ -119,36 +153,51 @@ export default Vue.extend({
             },
             [
                 this.genInputFile(),
-                this.$createElement(
-                    'v-container', 
-                    {
-                        gridListMd: true,
-                        textXsCenter: true
-                    },
-                    [
+                // this.$createElement(
+                //     'v-container', 
+                //     {
+                //         gridListMd: true,
+                //         textXsCenter: true
+                //     },
+                //     [
                         this.$createElement(
                             'v-layout',
                             {
-                                props: {
+                                attrs: {
                                     row: true,
-                                    wrap: true
+                                    wrap: true,
+                                    'fill-height': true,
                                 }
                             },
                             items
                         ),
-                        h('crop-dialog')
-                    ]
-                )
+                        h('crop-dialog'),
+                        this.genMessages()
+                //     ]
+                // )
             ]
         )
     },
     methods: {
+        genMessages () {
+            if (this.hideDetails) return null
+            if (this.errors.length) {
+                return this.$createElement(
+                    'v-messages',
+                    {
+                        props: {
+                            value: [this.validations], 
+                            color: 'error' 
+                        }
+                    }
+                )
+            }
+        },
         renderDefaultSlot() {
             if (this.$scopedSlots.default) {
                 return this.$scopedSlots.default(
                     { 
-                        openWindow: this.handleClick, 
-                        disabled: this.disabled,
+                        openWindow: this.handleClick,
                         errors: this.errors
                     }
                 )
@@ -156,12 +205,14 @@ export default Vue.extend({
             return this.genItemContainer([this.genDefaultSelector()])
         },
         renderItems() {
-            if (this.showAddBtn) {return [null]}
+            if (!this.hasItem || !this.showSelectedFile) {
+                return [null]
+            }
             if (!this.multiple) {
-                return [this.genItemContainer([this.genFileItem(this.fileObject, undefined)])];
+                return [this.genItemContainer([this.genFileItem(undefined)])];
             } else {
                 return this.fileObject.map( (file, index) => {
-                    return [this.genItemContainer([this.genFileItem(file, index)])]
+                    return [this.genItemContainer([this.genFileItem(index)])]
                 })
             }
         },
@@ -191,7 +242,8 @@ export default Vue.extend({
                 'div', 
                 {
                     style: {
-                        height: `${(this.boxHeight ? this.boxHeight : 100)}px`,
+                        'min-height': `${(this.boxHeight ? this.boxHeight : 100)}px`,
+                        'height': '100%',
                         cursor: !this.disabled ? 'pointer' : 'inherit'
                     },
                     class: {
@@ -206,11 +258,18 @@ export default Vue.extend({
                     this.$createElement(
                         'v-layout', 
                         {
-                            alignCenter: true,
-                            justifyCenter: true,
-                            row: true,
-                            fillHeight: true
+                            attrs: {
+                                'align-center': true,
+                                'justify-center': true,
+                                row: true,
+                                'fill-height': true,
+                                wrap: true
+                            },
+                            style: {
+                                margin: 0
+                            },
                         },
+                       
                         [
                             this.$createElement('v-icon', 'fa-plus')
                         ]
@@ -227,18 +286,28 @@ export default Vue.extend({
                 content
             )
         },
-        genFileItem (fileObject, fileIndex) {
+        genFileItem (fileIndex) {
             return this.$createElement(
                 'file-item',
                 {
                     props: {
-                        fileObject,
-                        fileIndex
+                        fileIndex,
+                        hideDetails: this.hideItemError
                     },
                     on: {
-                        delete: this.deleteFile,
-                        change: this.handleClick,
-                        showCropper: this.onShowCropBox
+                        'delete': (file, index) => {
+                            if (this.$listeners.delete) {
+                                this.$listeners.delete({
+                                    deleteLocalFile: () => this.deleteFile(file),
+                                    file: file,
+                                    index: index
+                                });
+                            } else {
+                                this.deleteFile(file)
+                            }
+                        },
+                        'open-window': this.handleClick,
+                        'open-cropper': this.onShowCropBox
                     }
                 }
             )
@@ -267,9 +336,6 @@ export default Vue.extend({
                 this.openBrowser = false;
             }
         },
-        cropped (fileObject, fileindex) {
-            this.$emit('cropped', fileObject, fileindex);
-        },
         onShowCropBox (fileObject, fileIndex) {
             this.showCropBox = true;
             this.fileIndexToCrop = fileIndex;
@@ -279,6 +345,7 @@ export default Vue.extend({
             this.showCropBox = false;
             this.fileIndexToCrop = null;
             this.fileObjectToCrop = null;
+            this.$emit('cropped')
         },
         handleClick() {
             // console.log('Tets I am calling..')
@@ -302,7 +369,7 @@ export default Vue.extend({
               });
             }
             this.validate();
-          }
+        }
     },
     created () {
         this.$lqForm.addProp(this.formName, this.id, 'formatter', this.formatter)

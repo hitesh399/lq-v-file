@@ -10,6 +10,8 @@ import VueCroppie from 'vue-croppie'
 import 'croppie/croppie.css' // import the croppie css manually
 import lqFile from '../main'
 import 'vuetify/dist/vuetify.min.css'
+import 'font-awesome/css/font-awesome.min.css'
+// import '../../node_modules/@mdi/font/css/materialdesignicons.css'
 
 import helper from 'vuejs-object-helper'
 Object.defineProperty(Vue.prototype, '$helper',   {value: helper});
