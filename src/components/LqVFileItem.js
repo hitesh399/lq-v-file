@@ -237,6 +237,7 @@ export default Vue.extend({
                     this.genDeleteBtn(),
                     !this.lqFile.multiple ? this.genChangeBtn() : null,
                     this.genCropBtn(),
+                    this.genViewBtn(),
                 ]
             )
         },
@@ -291,6 +292,35 @@ export default Vue.extend({
                 },
                 [
                     this.$createElement('v-icon', this.lqFile.changeIcon)
+                ]
+            )
+        },
+        genViewBtn () {
+            if (!this.lqFile.showViewBtn) {
+                return;
+            }
+            const self = this;
+            return this.$createElement(
+                'v-btn',
+                {
+                    props: {
+                        icon: true,
+                    },
+                    on: {
+                        click: function (event) {
+                            event.stopPropagation()
+                            const file = self.file;
+                            if (file) {
+                                const fileURL = URL.createObjectURL(file);
+                                window.open(fileURL, '_blank');
+                            } else {
+                                window.open(self.uploadedFileUrl, '_blank');
+                            }
+                        }
+                    }
+                },
+                [
+                    this.$createElement('v-icon', this.lqFile.viewIcon)
                 ]
             )
         },

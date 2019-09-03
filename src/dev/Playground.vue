@@ -10,12 +10,9 @@
           I am Her easkdskjhdk
           <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
             <lq-v-file  hideDetails  
+              show-view-btn
               id="my_file" 
-              multiple
-              :thumb="{width:600, height: 600}"
-              :flex-props="{md2: true, sm2: true, xs2: true}" 
-            />
-            
+            />            
             
             <v-btn type="submit">Save</v-btn>
             <v-btn type="button" @click.prevent="init">Init</v-btn>
@@ -54,8 +51,8 @@ export default {
           presence: {allowEmpty: false},
           file: {
             required: true,
-            crop: true,
-            acceptedFiles: 'image/*'
+            // crop: true,
+            // acceptedFiles: 'image/*'
           }
         }
       },

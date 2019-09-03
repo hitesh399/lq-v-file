@@ -102,6 +102,14 @@ export default Vue.extend({
             type: String,
             default: () => 'fa-plus'
         },
+        viewIcon: {
+            type: String,
+            default: () => 'fa-eye'
+        },
+        showViewBtn: {
+            type: Boolean,
+            default: () => false
+        },
         layoutTag: {
             type: String,
             default: () => 'v-layout'
