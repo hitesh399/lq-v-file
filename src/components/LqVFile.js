@@ -106,6 +106,26 @@ export default Vue.extend({
             type: String,
             default: () => 'fa-eye'
         },
+        deleteIconTitle: {
+            type: String,
+            default: () => 'Delete'
+        },
+        changeIconTitle: {
+            type: String,
+            default: () => 'Change'
+        },
+        cropIconTitle: {
+            type: String,
+            default: () => 'Crop'
+        },
+        addIconTitle: {
+            type: String,
+            default: () => 'Add'
+        },
+        viewIconTitle: {
+            type: String,
+            default: () => 'View'
+        },
         showViewBtn: {
             type: Boolean,
             default: () => false

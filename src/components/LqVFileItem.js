@@ -257,7 +257,14 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', this.lqFile.deleteIcon)
+                    this.$createElement('v-icon', 
+                        {
+                            attrs: {
+                                title: this.lqFile.deleteIconTitle
+                            }
+                        },
+                        this.lqFile.deleteIcon
+                    )
                 ]
             )
         },
@@ -291,7 +298,15 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', this.lqFile.changeIcon)
+                    this.$createElement(
+                        'v-icon', 
+                        {
+                            attrs: {
+                                title: self.lqFile.changeIconTitle
+                            },
+                        },
+                        this.lqFile.changeIcon
+                    )
                 ]
             )
         },
@@ -320,7 +335,15 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', this.lqFile.viewIcon)
+                    this.$createElement(
+                        'v-icon', 
+                        {
+                            attrs: {
+                                title: self.lqFile.viewIconTitle
+                            },
+                        },
+                        this.lqFile.viewIcon
+                    )
                 ]
             )
         },
@@ -343,7 +366,15 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', this.lqFile.cropIcon)
+                    this.$createElement(
+                        'v-icon', 
+                        {
+                            attrs: {
+                                title: self.lqFile.cropIconTitle
+                            },
+                        },
+                        this.lqFile.cropIcon
+                    )
                 ]
             )
         },
