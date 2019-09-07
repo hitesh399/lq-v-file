@@ -179,6 +179,13 @@ export default Vue.extend({
                 this.multiple ? [] : null
             );
         },
+        fileInitializeValue: function () {
+            return helper.getProp(
+                this.$store.state.form, 
+                `${this.formName}.initialize_values.${this.id}`,
+                this.multiple ? [] : null
+            );
+        },
         viewport: function () {
             if (!this.thumb) {
               return false;
@@ -217,7 +224,14 @@ export default Vue.extend({
                     },
                     items
                 ),
-                h('crop-dialog'),
+                h(
+                    'crop-dialog',
+                    {
+                        on: {
+                            close: this.onDialogCloseWithoutCrop
+                        }
+                    }
+                 ),
                 this.genMessages()
             ]
         )
@@ -339,16 +353,8 @@ export default Vue.extend({
                         hideDetails: this.hideItemError
                     },
                     on: {
-                        'delete': (file, index) => {
-                            if (this.$listeners.delete) {
-                                this.$listeners.delete({
-                                    deleteLocalFile: () => this.deleteFile(file),
-                                    file: file,
-                                    index: index
-                                });
-                            } else {
-                                this.deleteFile(file)
-                            }
+                        delete: (file, index) => {
+                            this.onFileDelete(file, index)
                         },
                         'open-window': this.handleClick,
                         'open-cropper': this.onShowCropBox
@@ -385,23 +391,55 @@ export default Vue.extend({
             this.fileIndexToCrop = fileIndex;
             this.fileObjectToCrop = fileObject;
         },
-        onHideCropBox () {
+        onHideCropBox (emit = true) {
             this.showCropBox = false;
             this.fileIndexToCrop = null;
             this.fileObjectToCrop = null;
-            this.$emit('cropped')
+            if (emit) {
+                this.$emit('cropped')
+            }
         },
         handleClick() {
-            // console.log('Tets I am calling..')
             if (!this.disabled) {
                 this.openBrowser = true;
                 this.$refs.input.value = null;
                 this.$refs.input.click();
             }
         },
+        onFileDelete (file, index) {
+            if (this.$listeners.delete) {
+                this.$listeners.delete({
+                    deleteLocalFile: () => this.deleteFile(file),
+                    file: file,
+                    index: index
+                });
+            } else {
+                this.deleteFile(file)
+            }
+        },
+        onDialogCloseWithoutCrop(file, index) {
+            if (this.$listeners.closeDialog) {
+                this.$listeners.closeDialog({
+                    deleteLocalFile: () => this.deleteFile(file),
+                    file: file,
+                    index: index
+                });
+            } else {
+                this.deleteFile(file)
+            }
+        },
         deleteFile (file) {
             if (!this.multiple) {
-              this.setValue(null);        
+              this.setValue(null)
+              if (this.fileInitializeValue) {
+                  const fileval = {...this.fileInitializeValue}
+                  this.$store.dispatch('form/setElementValue', {
+                      formName: this.lqForm.name,
+                      elementName: this.id,
+                      value: fileval
+                  });                  
+              }
+                   
             } else {
               this.fileObject.every( (f, index) => {
                   if ( (f.id && f.id === file.id) || f.uid === file.uid) {
@@ -414,6 +452,7 @@ export default Vue.extend({
             }
             this.validate();
         }
+
     },
     created () {
         this.$lqForm.addProp(this.formName, this.id, 'formatter', this.formatter)

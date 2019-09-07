@@ -380,7 +380,11 @@ export default Vue.extend({
         },
         readFile(showCroped = true) {
             if (!this.file) {
-            return;
+                this.imageRawData = null;
+                this.uploadedFileType = 'file';
+                this.isImage = false;
+                this.findUploadedFileType(this.uploadedFileUrl)
+                return;
             }
             let fReader = new FileReader();
             this.loading = true;

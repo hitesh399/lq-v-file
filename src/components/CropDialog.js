@@ -60,7 +60,15 @@ export default Vue.extend({
                 h(
                     'v-card',
                     [
-                        this.lqFile.popupTitle ? h('v-card-title', { class: {headline: true} }, this.lqFile.popupTitle) : null,
+                        h(
+                            'v-card-title', 
+                            { 
+                                class: {headline: true} 
+                            }, 
+                            [
+                                this.genToolBar()
+                            ]
+                        ),
                         h(
                             'v-card-text',
                             [
@@ -118,12 +126,59 @@ export default Vue.extend({
                                         }
                                     },
                                     'Crop'
-                                )
+                                ),
+                                this.genDeleteBtn()
                             ]
                         )
                     ]
                 )
             ]
         )
+    },
+    methods: {
+        genDeleteBtn () {
+            const self = this;
+            return this.$createElement(
+                'v-btn',
+                {
+                    props: {
+                        flat: true,
+                        color: 'danger darken-1',
+                    },
+                    on: {
+                        click: function (event) {
+                            event.stopPropagation()
+                            self.$emit('close', self.lqFile.fileObjectToCrop, self.lqFile.fileIndexToCrop)
+                            self.lqFile.onHideCropBox(false)
+                        }
+                    }
+                },
+                'Close'
+            )
+        },
+        genToolBar () {
+            if (!this.lqFile.popupTitle) {
+                return null;
+            }
+            return this.$createElement(
+                'v-toolbar',
+                {
+                    props: {
+                        flat: true,
+                        color: '#fff'
+                    }
+                },
+                [
+                    
+                    this.genHeading(),
+                ]
+            )
+        },
+        genHeading () {
+            return this.$createElement(
+                'v-toolbar-title',
+                this.lqFile.popupTitle
+            )
+        }
     }
 })

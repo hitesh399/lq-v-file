@@ -12,6 +12,7 @@
             <lq-v-file  hideDetails  
               show-view-btn
               id="my_file" 
+              :thumb="{width:600, height: 600}"
             />            
             
             <v-btn type="submit">Save</v-btn>
@@ -67,7 +68,7 @@ export default {
     init: function() {
       this.$lqForm.initializeValues('test_form', {
         my_file: {
-          path: 'https://vuejs.org/v2/guide/render-function.html',
+          path: 'https://tineye.com/images/widgets/mona.jpg',
           id: 1
         }
       })
