@@ -42,6 +42,13 @@ export default Vue.extend({
         fileId () {
             return this.fileIndex !== undefined ? `${this.lqFile.id}.${this.fileIndex}` : this.lqFile.id
         },
+        fileInitializeValue: function () {
+            return helper.getProp(
+                this.$store.state.form, 
+                `${this.lqFile.formName}.initialize_values.${this.fileId}`,
+                null
+            );
+        },
         fileName () {
            return this.file ? this.file.name : this.uploadedFileUrl.substring(this.uploadedFileUrl.lastIndexOf('/') +1 )
         },
@@ -239,8 +246,9 @@ export default Vue.extend({
                 },
                 [
                     this.genDeleteBtn(),
-                    !this.lqFile.multiple ? this.genChangeBtn() : null,
+                    this.genChangeBtn(),
                     this.genCropBtn(),
+                    this.genResetBtn(),
                     this.genViewBtn(),
                 ]
             )
@@ -297,7 +305,7 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            self.$emit('open-window', self.fileObject, self.fileIndex)
+                            self.$emit('open-window', self.fileIndex)
                         }
                     }
                 },
@@ -347,6 +355,45 @@ export default Vue.extend({
                             },
                         },
                         this.lqFile.viewIcon
+                    )
+                ]
+            )
+        },
+        genResetBtn () {
+            const self = this;
+            console.log('this.lqFile.showResetBtn', this.lqFile.showResetBtn)
+            if (!this.fileInitializeValue || !this.file || !this.lqFile.showResetBtn) {
+                return null;
+            }
+            return this.$createElement(
+                'v-btn',
+                {
+                    props: {
+                        icon: true,
+                    },
+                    on: {
+                        click: function (event) {
+                            event.stopPropagation()
+                            if (self.fileInitializeValue) {
+                                const fileval = {...self.fileInitializeValue}
+                                self.$store.dispatch('form/setElementValue', {
+                                    formName: self.lqFile.formName,
+                                    elementName: self.fileId,
+                                    value: fileval
+                                });
+                            }
+                        }
+                    }
+                },
+                [
+                    this.$createElement(
+                        'v-icon', 
+                        {
+                            attrs: {
+                                title: self.lqFile.showResetTitle
+                            },
+                        },
+                        self.lqFile.resetIcon
                     )
                 ]
             )

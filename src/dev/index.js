@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App'
 import Boilerplate from './Boilerplate'
-import Vuetifyt from 'vuetify'
+import vuetify from 'vuetify'
 // import '@mdi/font/css/materialdesignicons.css'
 import lqForm from 'lq-form'
 import store from '../store'
@@ -14,9 +14,6 @@ import 'font-awesome/css/font-awesome.min.css'
 // import '../../node_modules/@mdi/font/css/materialdesignicons.css'
 // import validatejs from 'validate.js';
 
-window.validatejs.validators.testv = function(value, rules,  id, values, options ) {
-  return Promise.resolve('Errooro sdmfnsjhk')
-}
 import helper from 'vuejs-object-helper'
 Object.defineProperty(Vue.prototype, '$helper',   {value: helper});
 Vue.use(VueCroppie)
@@ -27,7 +24,7 @@ Vue.use(lqForm, { store })
 
 Vue.config.performance = true
 
-Vue.use(Vuetifyt)
+Vue.use(vuetify)
 Vue.component(Boilerplate.name, Boilerplate)
 
 const vm = new Vue({

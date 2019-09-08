@@ -130,6 +130,18 @@ export default Vue.extend({
             type: Boolean,
             default: () => false
         },
+        resetIconTitle: {
+            type: String,
+            default: () => 'Rest'
+        },
+        showResetBtn: {
+            type: Boolean,
+            default: () => false
+        },
+        resetIcon: {
+            type: String,
+            default: () => 'fa-refresh'
+        },
         layoutTag: {
             type: String,
             default: () => 'v-layout'
@@ -150,7 +162,9 @@ export default Vue.extend({
             openBrowser: false,
             showCropBox: false,
             fileObjectToCrop: null,
-            fileIndexToCrop: null
+            fileIndexToCrop: null,
+            inputFileMultiple: false,
+            fileIndexTochange: undefined
         }
     },
     computed: {
@@ -282,7 +296,7 @@ export default Vue.extend({
                         id: `${this.formName}_${this.id}`,
                         name: this.id,
                         type: 'file',
-                        multiple: this.multiple,
+                        multiple: this.inputFileMultiple,
                     },
                     style: {
                         display: 'none'
@@ -309,7 +323,7 @@ export default Vue.extend({
                         'elevation-5': true
                     },
                     on: {
-                        click: this.handleClick
+                        click: (e) => { e.stopPropagation(); this.handleClick () }
                     },
                 },
                 [
@@ -363,7 +377,9 @@ export default Vue.extend({
             )
         },
         fileChanged (event) {
-            this.handleFileChange(event);
+            this.handleFileChange(event, this.fileIndexTochange);
+            this.fileIndexTochange = undefined
+            this.inputFileMultiple = this.multiple
             this.openBrowser = false;
         },
         formatter () {
@@ -399,9 +415,13 @@ export default Vue.extend({
                 this.$emit('cropped')
             }
         },
-        handleClick() {
+        handleClick(fileIndex) {
             if (!this.disabled) {
                 this.openBrowser = true;
+                if (fileIndex !== undefined) {
+                    this.fileIndexTochange = fileIndex
+                    this.inputFileMultiple = false;
+                }
                 this.$refs.input.value = null;
                 this.$refs.input.click();
             }
@@ -438,7 +458,8 @@ export default Vue.extend({
                       formName: this.lqForm.name,
                       elementName: this.id,
                       value: fileval
-                  });                  
+                  });
+                  this.validate();              
               }
                    
             } else {
@@ -451,10 +472,10 @@ export default Vue.extend({
                   }
               });
             }
-            this.validate();
         }
     },
     created () {
+        this.inputFileMultiple = this.multiple;
         this.$lqForm.addProp(this.formName, this.id, 'formatter', this.formatter)
     }
 })

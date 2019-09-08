@@ -11,8 +11,9 @@
           <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
             <lq-v-file    
               show-view-btn
-              id="my_file" 
+              id="my_file"
               multiple
+              show-reset-btn
               :thumb="{width:600, height: 600}"
             />            
             
@@ -52,6 +53,7 @@ export default {
         my_file: {
           // presence: {allowEmpty: false},
           file: {
+              crop: true,
               message: {
                   acceptedFiles: '^Please select only image.',
                   maxFileSize: '^Image size should be less than 1 MB.'                     
@@ -71,10 +73,10 @@ export default {
     },
     init: function() {
       this.$lqForm.initializeValues('test_form', {
-        my_file: {
+        my_file: [{
           path: 'https://tineye.com/images/widgets/mona.jpg',
           id: 1
-        }
+        }]
       })
     },
     uploading() {
