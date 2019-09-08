@@ -423,7 +423,7 @@ export default Vue.extend({
         },
         whenFileValidated (errors, error_in_rules) {
             this.errorRules = error_in_rules;
-            if (this.canShowCropper() && !this.isCropped) {
+            if (this.canShowCropper() && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined ) {
                 this.$emit('open-cropper', this.fileObject, this.fileIndex)
             }
         },

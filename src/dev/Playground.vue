@@ -8,19 +8,20 @@
         wrap>
         <v-flex md12>
           I am Her easkdskjhdk
-          <!-- <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
+          <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
             <lq-v-file  hideDetails  
               show-view-btn
               id="my_file" 
+              multiple
               :thumb="{width:600, height: 600}"
             />            
             
             <v-btn type="submit">Save</v-btn>
             <v-btn type="button" @click.prevent="init">Init</v-btn>
-          </lq-form> -->
+          </lq-form>
           
         </v-flex>
-        <lq-single-upload-file 
+        <!-- <lq-single-upload-file 
           id="test_file" 
           action="http://localhost:8080" 
           @uploading="uploading"
@@ -34,7 +35,7 @@
           <template v-slot:default="{openWindow, errors}">
               <v-btn @click.prevent="openWindow">Choose file to Upload</v-btn>
           </template>
-        </lq-single-upload-file>
+        </lq-single-upload-file> -->
     </v-layout>
  </v-container>
   </v-app>
@@ -52,10 +53,12 @@ export default {
           presence: {allowEmpty: false},
           file: {
             // required: true,
-            maxFileSize: 2,
-            crop: true,
-            minImageDimensions: [1500],
-            acceptedFiles: 'image/*'
+            max: 5,
+            acceptedFiles:['.jpg','.png','.txt','.docx','.pdf' ], 
+            message: {
+              max: '^You can  select only five education qualifications files',
+              acceptedFiles: '^File is invaid.'
+            }
           }
         }
       },
