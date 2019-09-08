@@ -122,42 +122,28 @@ export default Vue.extend({
             this.$emit('local-error', error, errorRules)
             this.$refs.lqfile.setValue(null)
         },
-        showCropper (callBack) {
+        showCropper () {
             if (!this.file) {
                 return;
             }
             let fReader = new FileReader();
             this.loading = true;
             fReader.onload = (event) => {
-                if (isImage(event.target.result) && this.canShowCropper()) {
+                if (isImage(event.target.result)) {
                     this.$refs.lqfile.onShowCropBox(this.file)
-                } else if (typeof callBack === 'function') {
-                    callBack()
                 }
             }
             fReader.readAsDataURL(this.file.original);
         },
         whenFileValidated (errors, errorRules) {
             this.errorRules = errorRules;
-            if (errors && this.thumb && this.canShowCropper() && !this.isCropped) {
-                this.showCropper(() => { this.onLocalError(errors, errorRules) })
-            } else if (!errors && !this.thumb) {
+            if (!errors && !this.thumb) {
                 this.uploadFile()
-            }  else if (!errors && this.thumb && this.canShowCropper() && !this.isCropped) {
+            }  else if (!errors && this.thumb && !this.isCropped) {
                 this.showCropper()
             } else if (errors) {
                 this.onLocalError(errors, errorRules)
             }
-        },
-        canShowCropper() {
-            if (
-                !this.errorRules || 
-                this.errorRules.length === 0 || 
-                (this.errorRules.length === 1 && this.errorRules[0] === 'file:crop') 
-            ) {
-                return true;
-            }
-            return false;
         }
     }
 })
