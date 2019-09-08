@@ -108,11 +108,11 @@ export default Vue.extend({
                     this.file = null
                 })
         },
-        onLocalError (error) {
-            this.$emit('local-error', error)
+        onLocalError (error, errorRules) {
+            this.$emit('local-error', error, errorRules)
             this.$refs.lqfile.setValue(null)
         },
-        showCropper () {
+        showCropper (callBack) {
             if (!this.file) {
                 return;
             }
@@ -121,6 +121,8 @@ export default Vue.extend({
             fReader.onload = (event) => {
                 if (isImage(event.target.result) && this.canShowCropper()) {
                     this.$refs.lqfile.onShowCropBox(this.file)
+                } else if (typeof callBack === 'function') {
+                    callBack()
                 }
             }
             fReader.readAsDataURL(this.file.original);
@@ -128,11 +130,13 @@ export default Vue.extend({
         whenFileValidated (errors, errorRules) {
             this.errorRules = errorRules;
             if (errors && this.thumb && this.canShowCropper()) {
-                this.showCropper()
+                this.showCropper(() => { this.onLocalError(errors, errorRules) })
             } else if (!errors && !this.thumb) {
                 this.uploadFile()
+            }  else if (!errors && this.thumb && this.canShowCropper()) {
+                this.showCropper()
             } else if (errors) {
-                this.onLocalError(errors)
+                this.onLocalError(errors, errorRules)
             }
         },
         canShowCropper() {
