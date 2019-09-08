@@ -28,6 +28,16 @@ export default Vue.extend({
         },
         formName () {
             return 'form_' + this.id
+        },
+        fileObject: function () {
+            return helper.getProp(
+                this.$store.state.form, 
+                `${this.formName}.values.${this.id}`,
+                {}
+            );
+        },
+        isCropped: function () {
+            return helper.getProp(this.fileObject, 'cropped', null);
         }
     },
     render (h) {
@@ -129,11 +139,11 @@ export default Vue.extend({
         },
         whenFileValidated (errors, errorRules) {
             this.errorRules = errorRules;
-            if (errors && this.thumb && this.canShowCropper()) {
+            if (errors && this.thumb && this.canShowCropper() && !this.isCropped) {
                 this.showCropper(() => { this.onLocalError(errors, errorRules) })
             } else if (!errors && !this.thumb) {
                 this.uploadFile()
-            }  else if (!errors && this.thumb && this.canShowCropper()) {
+            }  else if (!errors && this.thumb && this.canShowCropper() && !this.isCropped) {
                 this.showCropper()
             } else if (errors) {
                 this.onLocalError(errors, errorRules)

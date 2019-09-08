@@ -50,7 +50,7 @@ export default {
     return {
       rules: {
         my_file: {
-          presence: {allowEmpty: false},
+          // presence: {allowEmpty: false},
           file: {
               message: {
                   acceptedFiles: '^Please select only image.',
