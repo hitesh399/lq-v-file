@@ -12,7 +12,11 @@ import lqFile from '../main'
 import 'vuetify/dist/vuetify.min.css'
 import 'font-awesome/css/font-awesome.min.css'
 // import '../../node_modules/@mdi/font/css/materialdesignicons.css'
+// import validatejs from 'validate.js';
 
+window.validatejs.validators.testv = function(value, rules,  id, values, options ) {
+  return Promise.resolve('Errooro sdmfnsjhk')
+}
 import helper from 'vuejs-object-helper'
 Object.defineProperty(Vue.prototype, '$helper',   {value: helper});
 Vue.use(VueCroppie)

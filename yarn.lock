@@ -4973,10 +4973,10 @@ lower-case@^1.1.1:
   resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-1.1.4.tgz#9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac"
   integrity sha1-miyr0bno4K6ZOkv31YdcOcQujqw=
 
-lq-form@^0.1.70:
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/lq-form/-/lq-form-0.1.70.tgz#a55ee8a7f0b206f1ad4aad2ece16a074b60053fd"
-  integrity sha512-FpB9shqxwQTKwtYFBpDkEFpxeNwprDDt4kFYBIkCzL8Miogp4gslwHf72c6pvOILiglMpVQZ7sztwhOpYwOyGw==
+lq-form@^0.1.71:
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/lq-form/-/lq-form-0.1.71.tgz#61447ffca6eab915028c65bec4e75505a5d3c770"
+  integrity sha512-huKe18jzbNnYidE1QpW2fTquiIedqYJp4P0rexg/BC76nLDInGYloxiVU4FI1UqDFC8jduaE/GA85c7wVzHPqg==
   dependencies:
     axios "^0.19.0"
     lodash "^4.17.14"
@@ -8028,6 +8028,11 @@ validate.js@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/validate.js/-/validate.js-0.12.0.tgz#17f989e37c192ea2f826bbf19bf4e97e6e4be68f"
   integrity sha512-/x2RJSvbqEyxKj0RPN4xaRquK+EggjeVXiDDEyrJzsJogjtiZ9ov7lj/svVb4DM5Q5braQF4cooAryQbUwOxlA==
+
+validate.js@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/validate.js/-/validate.js-0.13.1.tgz#b58bfac04a0f600a340f62e5227e70d95971e92a"
+  integrity sha512-PnFM3xiZ+kYmLyTiMgTYmU7ZHkjBZz2/+F0DaALc/uUtVzdCt1wAosvYJ5hFQi/hz8O4zb52FQhHZRC+uVkJ+g==
 
 vary@~1.1.2:
   version "1.1.2"

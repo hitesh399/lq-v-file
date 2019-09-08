@@ -45,7 +45,7 @@ export default Vue.extend({
         fileName () {
            return this.file ? this.file.name : this.uploadedFileUrl.substring(this.uploadedFileUrl.lastIndexOf('/') +1 )
         },
-        error () {
+        errors () {
             let fileId = this.fileId
             let fileObjectPath = [ this.lqForm.name, 'errors', fileId ]
             let filePath = [ this.lqForm.name, 'errors', fileId, 'file' ]
@@ -61,8 +61,10 @@ export default Vue.extend({
             )
             const error1 = helper.isArray(fileObjectError) ? fileObjectError : [];
             const error2 = helper.isArray(fileError) ? fileError : [];
-            const errors = error1.concat(error2)
-            return errors.length ? errors[0] : null;
+            return error1.concat(error2)
+        },
+        error () {
+            return this.errors.length ? this.errors[0] : null;
         },
         isCropped: function () {
             return helper.getProp(this.fileObject, 'cropped', null);
@@ -429,9 +431,12 @@ export default Vue.extend({
         },
         canShowCropper() {
             if (
+                !this.error ||
                 !this.errorRules || 
-                this.errorRules.length === 0 || 
-                (this.errorRules.length === 1 && this.errorRules[0] === 'file:crop') 
+                this.errorRules.length  === 0 ||
+                (
+                    this.errors.length === 1 && this.errorRules[0] === 'file:crop'
+                ) 
             ) {
                 return true;
             }

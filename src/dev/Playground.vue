@@ -8,8 +8,8 @@
         wrap>
         <v-flex md12>
           I am Her easkdskjhdk
-          <!-- <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
-            <lq-v-file  hideDetails  
+          <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
+            <lq-v-file    
               show-view-btn
               id="my_file" 
               multiple
@@ -18,7 +18,7 @@
             
             <v-btn type="submit">Save</v-btn>
             <v-btn type="button" @click.prevent="init">Init</v-btn>
-          </lq-form>-->
+          </lq-form>
           
         </v-flex> 
         <lq-single-upload-file 
@@ -80,8 +80,8 @@ export default {
     uploading() {
       console.log('I am updating...')
     },
-    error() {
-      console.log('I am error')
+    error(e1, e2) {
+      console.log('I am error', e1, e2)
     },
     success() {
       console.log('I am success')
