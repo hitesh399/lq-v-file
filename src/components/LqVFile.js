@@ -228,7 +228,7 @@ export default Vue.extend({
                     'crop-dialog',
                     {
                         on: {
-                            close: this.onDialogCloseWithoutCrop
+                            close: this.dialogClosedWithoutCrop 
                         }
                     }
                  ),
@@ -417,15 +417,16 @@ export default Vue.extend({
                 this.deleteFile(file)
             }
         },
-        onDialogCloseWithoutCrop(file, index) {
-            if (this.$listeners.closeDialog) {
-                this.$listeners.closeDialog({
+        dialogClosedWithoutCrop (file, index) {
+            if (this.$listeners['close-dialog']) {
+                this.$listeners['close-dialog']({
                     deleteLocalFile: () => this.deleteFile(file),
                     file: file,
                     index: index
                 });
             } else {
-                this.deleteFile(file)
+                // console.log('I am calling Here.')
+                // this.deleteFile(file)
             }
         },
         deleteFile (file) {
@@ -452,7 +453,6 @@ export default Vue.extend({
             }
             this.validate();
         }
-
     },
     created () {
         this.$lqForm.addProp(this.formName, this.id, 'formatter', this.formatter)

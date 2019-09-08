@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import  helper, { isImage } from 'vuejs-object-helper';
+import { EventBus } from 'lq-form'
 
 export default Vue.extend({
     name: 'lq-file-item',
@@ -22,6 +23,7 @@ export default Vue.extend({
             isImage: false,
             imageRawData: '',
             hover: false,
+            errorRules: [],
             uploadedFileType: null
         }
     },
@@ -348,6 +350,7 @@ export default Vue.extend({
             )
         },
         genCropBtn () {
+            if (!this.canShowCropper()) {return}
             const self = this;
             if (!(this.isImage && this.file && this.lqFile.thumb)) {
                 return
@@ -390,8 +393,12 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.isImage  =  isImage(e.target.result) ? true : false;
+                // console.log('I am sjdgsjhgdhjsd T1', this.isImage, this.isCropped, showCroped , this.lqFile.thumb)
                 if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
-                    this.$emit('open-cropper', this.fileObject, this.fileIndex)
+
+                    if (!this.lqFile.lqElRules) {
+                        this.$emit('open-cropper', this.fileObject, this.fileIndex)
+                    }
                 }
                 this.loading = false;
                 this.imageRawData = e.target.result;
@@ -413,7 +420,29 @@ export default Vue.extend({
             }
             }
             img.src = url;
+        },
+        whenFileValidated (errors, error_in_rules) {
+            this.errorRules = error_in_rules;
+            if (this.canShowCropper() && !this.isCropped) {
+                this.$emit('open-cropper', this.fileObject, this.fileIndex)
+            }
+        },
+        canShowCropper() {
+            if (
+                !this.errorRules || 
+                this.errorRules.length === 0 || 
+                (this.errorRules.length === 1 && this.errorRules[0] === 'file:crop') 
+            ) {
+                return true;
+            }
+            return false;
         }
+    },
+    created () {
+        EventBus.$on('lq-element-validated-' + this.lqForm.formName + '-' + this.fileId, this.whenFileValidated)
+    },
+    beforeDestroy () {
+        EventBus.$off('lq-element-validated-' + this.lqForm.formName + '-' + this.fileId, this.whenFileValidated)
     },
     watch: {
         uuid:{

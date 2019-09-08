@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import helper, { isImage } from 'vuejs-object-helper'
 import LqForm from './LqForm'
+import { EventBus } from 'lq-form'
 
 export default Vue.extend({
     name: 'lq-upload-file',
@@ -24,6 +25,9 @@ export default Vue.extend({
     computed: {
         myLqForm () {
             return this.$refs.lqForm;
+        },
+        formName () {
+            return 'form_' + this.id
         }
     },
     render (h) {
@@ -32,7 +36,7 @@ export default Vue.extend({
                 'lq-form',
                 {
                     props: {
-                        name: 'form_' + this.id,
+                        name: this.formName,
                         rules: this.rules ? {[this.id]: this.rules} : undefined
                     },
                     ref: 'lqForm'
@@ -45,12 +49,13 @@ export default Vue.extend({
     },
     data () {
         return  {
-            uploading: false
+            uploading: false,
+            file: null,
+            errorRules: []
         }
     },
     methods: {
         genFile () {
-            console.log('this.$attrs', this.$attrs)
             return this.$createElement(
                 'lq-v-file',
                 {
@@ -64,17 +69,7 @@ export default Vue.extend({
                     on: {
                         changed: (e) => {
                             const rules = this.$refs.lqfile.lqElRules
-                            if (this.thumb) {
-                                let fReader = new FileReader();
-                                this.loading = true;
-                                fReader.onload = (event) => {
-                                   if (isImage(event.target.result)) {
-                                    this.$refs.lqfile.onShowCropBox(e)
-                                   }
-                                }
-                                fReader.readAsDataURL(e.file);
-                                return;
-                            }
+                            this.file = e;
                             if (!rules) {
                                 this.uploadFile()
                             }
@@ -82,10 +77,7 @@ export default Vue.extend({
                         cropped: () => {
                             this.uploadFile();
                         },
-                        'element-validated': (validateStatus) => {
-                            !validateStatus ? ( !this.thumb ? this.uploadFile() : null) : this.onLocalError(validateStatus)
-                        }
-                        
+                        'element-validated': this.whenFileValidated
                     },
                     ref: 'lqfile',
                     scopedSlots: this.$scopedSlots
@@ -98,6 +90,7 @@ export default Vue.extend({
             this.$emit('uploading');
             this.uploading = true
             const values = {[this.id]: this.$refs.lqfile.formatter()};
+            console.log('FIle UPloading..', values)
             let form = undefined;
             if (this.otherData) {
                 form = helper.objectToFormData(this.otherData)
@@ -107,16 +100,50 @@ export default Vue.extend({
                 .then((response) => {
                     this.$emit('server-success', response)
                     this.uploading = false
+                    this.file = null
                 }).catch((error) => {
                     this.$emit('server-error', error)
                     this.$refs.lqfile.setValue(null)
                     this.uploading = false
+                    this.file = null
                 })
         },
         onLocalError (error) {
-            console.log('I am done', error)
             this.$emit('local-error', error)
             this.$refs.lqfile.setValue(null)
+        },
+        showCropper () {
+            if (!this.file) {
+                return;
+            }
+            let fReader = new FileReader();
+            this.loading = true;
+            fReader.onload = (event) => {
+                if (isImage(event.target.result) && this.canShowCropper()) {
+                    this.$refs.lqfile.onShowCropBox(this.file)
+                }
+            }
+            fReader.readAsDataURL(this.file.original);
+        },
+        whenFileValidated (errors, errorRules) {
+            this.errorRules = errorRules;
+            if (errors && this.thumb && this.canShowCropper()) {
+                this.showCropper()
+            } else if (!errors && !this.thumb) {
+                this.uploadFile()
+            } else if (errors) {
+                this.onLocalError(errors)
+            }
+        },
+        canShowCropper() {
+            if (
+                !this.errorRules || 
+                this.errorRules.length === 0 || 
+                (this.errorRules.length === 1 && this.errorRules[0] === 'file:crop') 
+            ) {
+                return true;
+            }
+            return false;
         }
     }
 })
