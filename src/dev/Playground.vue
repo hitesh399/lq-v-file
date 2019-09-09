@@ -59,7 +59,7 @@ export default {
                   maxFileSize: '^Image size should be less than 1 MB.'                     
               },
               acceptedFiles: 'image/*',
-              maxFileSize: 1,
+              maxFileSize: 50,
           }
         }
       },
