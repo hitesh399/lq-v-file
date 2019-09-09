@@ -22,15 +22,15 @@ export default Vue.extend({
         rules: Object,
     },
     computed: {
-        myLqForm () {
+        myLqForm() {
             return this.$refs.lqForm;
         },
-        formName () {
+        formName() {
             return 'form_' + this.id
         },
         fileObject: function () {
             return helper.getProp(
-                this.$store.state.form, 
+                this.$store.state.form,
                 `${this.formName}.values.${this.id}`,
                 {}
             );
@@ -39,14 +39,14 @@ export default Vue.extend({
             return helper.getProp(this.fileObject, 'cropped', null);
         }
     },
-    render (h) {
+    render(h) {
         if (!this.lqForm) {
             return h(
                 'lq-form',
                 {
                     props: {
                         name: this.formName,
-                        rules: this.rules ? {[this.id]: this.rules} : undefined
+                        rules: this.rules ? { [this.id]: this.rules } : undefined
                     },
                     ref: 'lqForm'
                 },
@@ -56,15 +56,15 @@ export default Vue.extend({
         return this.genFile();
 
     },
-    data () {
-        return  {
+    data() {
+        return {
             uploading: false,
             file: null,
             errorRules: []
         }
     },
     methods: {
-        genFile () {
+        genFile() {
             return this.$createElement(
                 'lq-v-file',
                 {
@@ -95,10 +95,10 @@ export default Vue.extend({
             )
         },
         uploadFile() {
-            if (this.uploading) {return false}
+            if (this.uploading) { return false }
             this.$emit('uploading');
             this.uploading = true
-            const values = {[this.id]: this.$refs.lqfile.formatter()};
+            const values = { [this.id]: this.$refs.lqfile.formatter() };
             let form = undefined;
             if (this.otherData) {
                 form = helper.objectToFormData(this.otherData)
@@ -116,11 +116,11 @@ export default Vue.extend({
                     this.file = null
                 })
         },
-        onLocalError (error, errorRules) {
+        onLocalError(error, errorRules) {
             this.$emit('local-error', error, errorRules)
             this.$refs.lqfile.setValue(null)
         },
-        showCropper () {
+        showCropper() {
             if (!this.file) {
                 return;
             }
@@ -133,11 +133,11 @@ export default Vue.extend({
             }
             fReader.readAsDataURL(this.file.original);
         },
-        whenFileValidated (errors, errorRules) {
+        whenFileValidated(errors, errorRules) {
             this.errorRules = errorRules;
             if (!errors && !this.thumb) {
                 this.uploadFile()
-            }  else if (!errors && this.thumb && !this.isCropped) {
+            } else if (!errors && this.thumb && !this.isCropped) {
                 this.showCropper()
             } else if (errors) {
                 this.onLocalError(errors, errorRules)
