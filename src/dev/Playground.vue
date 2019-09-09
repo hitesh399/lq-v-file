@@ -13,10 +13,11 @@
               show-view-btn
               id="my_file"
               multiple
+              enable-drop-zone
               show-reset-btn
+              :show-change-btn="false"
               :thumb="{width:600, height: 600}"
             />            
-            
             <v-btn type="submit">Save</v-btn>
             <v-btn type="button" @click.prevent="init">Init</v-btn>
           </lq-form>

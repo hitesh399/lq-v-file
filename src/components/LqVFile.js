@@ -130,6 +130,10 @@ export default Vue.extend({
             type: Boolean,
             default: () => false
         },
+        showChangeBtn: {
+            type: Boolean,
+            default: () => true
+        },
         resetIconTitle: {
             type: String,
             default: () => 'Rest'
@@ -137,6 +141,10 @@ export default Vue.extend({
         showResetBtn: {
             type: Boolean,
             default: () => false
+        },
+        enableDropZone: {
+            type: Boolean,
+            default: () => true
         },
         resetIcon: {
             type: String,
@@ -227,6 +235,10 @@ export default Vue.extend({
             {
                 class: {
                     'has-errors': this.errors && this.errors.length ? true : false 
+                },
+                on: {
+                    dragover: (e) => { e.preventDefault();},
+                    drop: this.onDrag
                 }
             },
             [
@@ -264,6 +276,13 @@ export default Vue.extend({
                     }
                 )
             }
+        },
+        onDrag(e) {
+            e.preventDefault();
+            if (!e.dataTransfer.files || !this.enableDropZone) {
+                return;
+            }
+            this.fileChanged( { target: e.dataTransfer} )
         },
         renderDefaultSlot() {
             if (this.$scopedSlots.default) {
@@ -323,8 +342,9 @@ export default Vue.extend({
                         'elevation-5': true
                     },
                     on: {
-                        click: (e) => { e.stopPropagation(); this.handleClick () }
+                        click: (e) => { e.stopPropagation(); this.handleClick () },
                     },
+                    nativeOn: {}
                 },
                 [
                     this.$createElement(

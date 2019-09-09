@@ -295,6 +295,9 @@ export default Vue.extend({
             }
         },
         genChangeBtn () {
+            if (!this.lqFile.showChangeBtn) {
+                return;
+            }
             const self = this;
             return this.$createElement(
                 'v-btn',
@@ -361,7 +364,6 @@ export default Vue.extend({
         },
         genResetBtn () {
             const self = this;
-            console.log('this.lqFile.showResetBtn', this.lqFile.showResetBtn)
             if (!this.fileInitializeValue || !this.file || !this.lqFile.showResetBtn) {
                 return null;
             }
