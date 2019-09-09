@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import helper, { isImage } from 'vuejs-object-helper'
 import LqForm from './LqForm'
-import { EventBus } from 'lq-form'
 
 export default Vue.extend({
     name: 'lq-upload-file',
@@ -100,7 +99,6 @@ export default Vue.extend({
             this.$emit('uploading');
             this.uploading = true
             const values = {[this.id]: this.$refs.lqfile.formatter()};
-            console.log('FIle UPloading..', values)
             let form = undefined;
             if (this.otherData) {
                 form = helper.objectToFormData(this.otherData)

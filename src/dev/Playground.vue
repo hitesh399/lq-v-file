@@ -12,7 +12,6 @@
             <lq-v-file    
               show-view-btn
               id="my_file"
-              multiple
               enable-drop-zone
               show-reset-btn
               :show-change-btn="false"
