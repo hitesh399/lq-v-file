@@ -11,12 +11,12 @@ export default Vue.extend({
             required: true
         },
         viewport: {
-          type: Object,
-          required: true
+            type: Object,
+            required: true
         },
         size: {
-          type: [String, Object],
-          default: () => 'original'
+            type: [String, Object],
+            default: () => 'original'
         },
         showZoomer: {
             type: Boolean,
@@ -32,8 +32,8 @@ export default Vue.extend({
         }
     },
     inject: ['lqForm', 'lqFile'],
-    render (h) {
-        return  h(
+    render(h) {
+        return h(
             'div',
             {
                 style: {
@@ -56,7 +56,7 @@ export default Vue.extend({
     },
     created() {
         this.readFile();
-      },
+    },
     watch: {
         file: function () {
             this.readFile();
@@ -92,7 +92,7 @@ export default Vue.extend({
             }
             this.$refs.croppieRef.result(options, (output) => {
                 let name = this.file.name
-                let newFile = new File([output], name , {type: this.circle ? 'png' : this.file.type })
+                let newFile = new File([output], name, { type: this.circle ? 'png' : this.file.type })
                 let elementName = this.target + '.file'
                 this.$store.dispatch('form/setElementValue', {
                     formName: this.lqForm.name,
@@ -109,40 +109,40 @@ export default Vue.extend({
                     elementName: this.target + '.uid',
                     value: Date.now()
                 })
-                this.lqFile.validate();          
+                this.lqFile.validate();
                 this.$emit('cropped', this.fileObject, this.fileIndex);
             });
         },
         getFileExt(name) {
             let name_arr = name.split('.')
-            return name_arr[name_arr.length -1]
+            return name_arr[name_arr.length - 1]
         },
         createFileName(name, include) {
             let name_arr = name.split('.')
-            name_arr[name_arr.length -1] = include + '.' + name_arr[name_arr.length -1]
+            name_arr[name_arr.length - 1] = include + '.' + name_arr[name_arr.length - 1]
             return name_arr.join('.')
         },
-        genProcessBar () {
+        genProcessBar() {
             return this.$createElement(
-                'div', 
-                { 
-                    style: { 
-                        width: '96%', position: 'absolute', top: '48px' 
-                    } 
+                'div',
+                {
+                    style: {
+                        width: '96%', position: 'absolute', top: '48px'
+                    }
                 },
-                this.$createElement('v-progress-linear', {props: {indeterminate: true }})
+                this.$createElement('v-progress-linear', { props: { indeterminate: true } })
             )
         },
         genCropper() {
             return this.$createElement(
-                'vue-croppie', 
+                'vue-croppie',
                 {
                     ref: 'croppieRef',
                     props: {
                         viewport: this.viewport,
                         showZoomer: this.showZoomer,
                         enableResize: this.enableResize,
-                        
+
                         ...this.$attrs
                     }
                 }

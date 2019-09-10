@@ -1,5 +1,6 @@
 import Vue from 'vue'
-import  helper, { isImage } from 'vuejs-object-helper';
+import helper, { isImage } from 'vuejs-object-helper';
+import { EventBus } from 'lq-form'
 
 export default Vue.extend({
     name: 'lq-file-item',
@@ -16,44 +17,45 @@ export default Vue.extend({
         },
         fileIndex: Number
     },
-    data () {
+    data() {
         return {
             loading: false,
             isImage: false,
             imageRawData: '',
             hover: false,
+            errorRules: [],
             uploadedFileType: null
         }
     },
-    
+
     computed: {
         fileObject: function () {
             return helper.getProp(
-                this.$store.state.form, 
+                this.$store.state.form,
                 `${this.lqFile.formName}.values.${this.fileId}`,
                 {}
-            );
-        },
-        validating () {
-            return helper.getProp(
-                this.$store.state.form, 
-                [this.lqFile.formName, 'fields', this.lqFile.id, 'validating'],
-                false
             );
         },
         boxHeight() {
             return this.lqFile.boxHeight ? this.lqFile.boxHeight : 100;
         },
-        fileId () {
+        fileId() {
             return this.fileIndex !== undefined ? `${this.lqFile.id}.${this.fileIndex}` : this.lqFile.id
         },
-        fileName () {
-           return this.file ? this.file.name : this.uploadedFileUrl.substring(this.uploadedFileUrl.lastIndexOf('/') +1 )
+        fileInitializeValue: function () {
+            return helper.getProp(
+                this.$store.state.form,
+                `${this.lqFile.formName}.initialize_values.${this.fileId}`,
+                null
+            );
         },
-        error () {
+        fileName() {
+            return this.file ? this.file.name : this.uploadedFileUrl.substring(this.uploadedFileUrl.lastIndexOf('/') + 1)
+        },
+        errors() {
             let fileId = this.fileId
-            let fileObjectPath = [ this.lqForm.name, 'errors', fileId ]
-            let filePath = [ this.lqForm.name, 'errors', fileId, 'file' ]
+            let fileObjectPath = [this.lqForm.name, 'errors', fileId]
+            let filePath = [this.lqForm.name, 'errors', fileId, 'file']
             const fileObjectError = this.$helper.getProp(
                 this.$store.state.form,
                 fileObjectPath,
@@ -66,8 +68,10 @@ export default Vue.extend({
             )
             const error1 = helper.isArray(fileObjectError) ? fileObjectError : [];
             const error2 = helper.isArray(fileError) ? fileError : [];
-            const errors = error1.concat(error2)
-            return errors.length ? errors[0] : null;
+            return error1.concat(error2)
+        },
+        error() {
+            return this.errors.length ? this.errors[0] : null;
         },
         isCropped: function () {
             return helper.getProp(this.fileObject, 'cropped', null);
@@ -75,7 +79,7 @@ export default Vue.extend({
         originalFile: function () {
             return helper.getProp(this.fileObject, 'original', null);
         },
-        uuid: function () {      
+        uuid: function () {
             return helper.getProp(this.fileObject, 'uid', null);
         },
         file: function () {
@@ -95,8 +99,8 @@ export default Vue.extend({
                 return false;
             }
             if (this.lqFile.popupHeight <= this.lqFile.thumb.height) {
-                let newHeight  = (this.lqFile.popupHeight - 20);
-                let newWidth = this.lqFile.thumb.width/this.lqFile.thumb.height * newHeight
+                let newHeight = (this.lqFile.popupHeight - 20);
+                let newWidth = this.lqFile.thumb.width / this.lqFile.thumb.height * newHeight
                 return {
                     width: newWidth,
                     height: newHeight
@@ -115,7 +119,7 @@ export default Vue.extend({
                     item: true,
                     'elevation-5': true,
                     'is-error': !!this.error,
-                    ['unique-' + this.uuid] : true
+                    ['unique-' + this.uuid]: true
                 },
                 style: {
                     'min-height': `${(this.boxHeight ? this.boxHeight : 100)}px`,
@@ -125,7 +129,7 @@ export default Vue.extend({
             },
             [
                 this.$createElement(
-                    'v-layout', 
+                    'v-layout',
                     {
                         attrs: {
                             'align-center': true,
@@ -144,7 +148,7 @@ export default Vue.extend({
                             {
                                 scopedSlots: {
                                     default: function ({ hover }) {
-                                        return self.isImage || self.uploadedFileType === 'image' ?  self.genImageItem(hover) : self.genFileItem(hover)
+                                        return self.isImage || self.uploadedFileType === 'image' ? self.genImageItem(hover) : self.genFileItem(hover)
                                     }
                                 }
                             }
@@ -157,16 +161,16 @@ export default Vue.extend({
         )
     },
     methods: {
-        genImageItem (hover) {
+        genImageItem(hover) {
             return this.$createElement(
                 'v-img',
                 {
                     props: {
                         src: this.previewImage,
-                        aspectRatio: this.lqFile.thumb ? this.lqFile.thumb.width/this.lqFile.thumb.height : this.lqFile.aspectRatio,
+                        aspectRatio: this.lqFile.thumb ? this.lqFile.thumb.width / this.lqFile.thumb.height : this.lqFile.aspectRatio,
                         class: {
                             grey: true,
-                            'lighten-2': true 
+                            'lighten-2': true
                         }
                     }
                 },
@@ -217,7 +221,7 @@ export default Vue.extend({
                 ]
             )
         },
-        genHoverItem () {
+        genHoverItem() {
             return this.$createElement(
                 'v-layout',
                 {
@@ -242,13 +246,14 @@ export default Vue.extend({
                 },
                 [
                     this.genDeleteBtn(),
-                    !this.lqFile.multiple ? this.genChangeBtn() : null,
+                    this.genChangeBtn(),
                     this.genCropBtn(),
+                    this.genResetBtn(),
                     this.genViewBtn(),
                 ]
             )
         },
-        genDeleteBtn () {
+        genDeleteBtn() {
             const self = this;
             return this.$createElement(
                 'v-btn',
@@ -264,7 +269,7 @@ export default Vue.extend({
                     }
                 },
                 [
-                    this.$createElement('v-icon', 
+                    this.$createElement('v-icon',
                         {
                             attrs: {
                                 title: this.lqFile.deleteIconTitle
@@ -275,21 +280,24 @@ export default Vue.extend({
                 ]
             )
         },
-        genMessages () {
+        genMessages() {
             if (this.hideDetails) return null
             if (this.error) {
                 return this.$createElement(
                     'v-messages',
                     {
                         props: {
-                            value: [this.error], 
-                            color: 'error' 
+                            value: [this.error],
+                            color: 'error'
                         }
                     }
                 )
             }
         },
-        genChangeBtn () {
+        genChangeBtn() {
+            if (!this.lqFile.showChangeBtn) {
+                return;
+            }
             const self = this;
             return this.$createElement(
                 'v-btn',
@@ -300,13 +308,13 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            self.$emit('open-window', self.fileObject, self.fileIndex)
+                            self.$emit('open-window', self.fileIndex)
                         }
                     }
                 },
                 [
                     this.$createElement(
-                        'v-icon', 
+                        'v-icon',
                         {
                             attrs: {
                                 title: self.lqFile.changeIconTitle
@@ -317,7 +325,7 @@ export default Vue.extend({
                 ]
             )
         },
-        genViewBtn () {
+        genViewBtn() {
             if (!this.lqFile.showViewBtn) {
                 return;
             }
@@ -343,7 +351,7 @@ export default Vue.extend({
                 },
                 [
                     this.$createElement(
-                        'v-icon', 
+                        'v-icon',
                         {
                             attrs: {
                                 title: self.lqFile.viewIconTitle
@@ -354,7 +362,46 @@ export default Vue.extend({
                 ]
             )
         },
-        genCropBtn () {
+        genResetBtn() {
+            const self = this;
+            if (!this.fileInitializeValue || !this.file || !this.lqFile.showResetBtn) {
+                return null;
+            }
+            return this.$createElement(
+                'v-btn',
+                {
+                    props: {
+                        icon: true,
+                    },
+                    on: {
+                        click: function (event) {
+                            event.stopPropagation()
+                            if (self.fileInitializeValue) {
+                                const fileval = { ...self.fileInitializeValue }
+                                self.$store.dispatch('form/setElementValue', {
+                                    formName: self.lqFile.formName,
+                                    elementName: self.fileId,
+                                    value: fileval
+                                });
+                            }
+                        }
+                    }
+                },
+                [
+                    this.$createElement(
+                        'v-icon',
+                        {
+                            attrs: {
+                                title: self.lqFile.showResetTitle
+                            },
+                        },
+                        self.lqFile.resetIcon
+                    )
+                ]
+            )
+        },
+        genCropBtn() {
+            if (!this.canShowCropper()) { return }
             const self = this;
             if (!(this.isImage && this.file && this.lqFile.thumb)) {
                 return
@@ -374,7 +421,7 @@ export default Vue.extend({
                 },
                 [
                     this.$createElement(
-                        'v-icon', 
+                        'v-icon',
                         {
                             attrs: {
                                 title: self.lqFile.cropIconTitle
@@ -396,10 +443,13 @@ export default Vue.extend({
             let fReader = new FileReader();
             this.loading = true;
             fReader.onload = (e) => {
-                this.isImage  =  isImage(e.target.result) ? true : false;
-                // console.log('klsdkshdkjsdfsf')
+                this.isImage = isImage(e.target.result) ? true : false;
+                // console.log('I am sjdgsjhgdhjsd T1', this.isImage, this.isCropped, showCroped , this.lqFile.thumb)
                 if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
-                    this.$emit('open-cropper', this.fileObject, this.fileIndex)
+
+                    if (!this.lqFile.lqElRules) {
+                        this.$emit('open-cropper', this.fileObject, this.fileIndex)
+                    }
                 }
                 this.loading = false;
                 this.imageRawData = e.target.result;
@@ -414,17 +464,42 @@ export default Vue.extend({
 
             var img = new Image();
             img.onload = (e) => {
-            if (e.type === 'load') {
-                this.uploadedFileType = 'image'
-            } else {
-                this.uploadedFileType = 'file'
-            }
+                if (e.type === 'load') {
+                    this.uploadedFileType = 'image'
+                } else {
+                    this.uploadedFileType = 'file'
+                }
             }
             img.src = url;
+        },
+        whenFileValidated(errors, error_in_rules) {
+            this.errorRules = error_in_rules;
+            if (this.canShowCropper() && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
+                this.$emit('open-cropper', this.fileObject, this.fileIndex)
+            }
+        },
+        canShowCropper() {
+            if (
+                !this.error ||
+                !this.errorRules ||
+                this.errorRules.length === 0 ||
+                (
+                    this.errors.length === 1 && this.errorRules[0] === 'file:crop'
+                )
+            ) {
+                return true;
+            }
+            return false;
         }
     },
+    created() {
+        EventBus.$on('lq-element-validated-' + this.lqForm.formName + '-' + this.fileId, this.whenFileValidated)
+    },
+    beforeDestroy() {
+        EventBus.$off('lq-element-validated-' + this.lqForm.formName + '-' + this.fileId, this.whenFileValidated)
+    },
     watch: {
-        uuid:{
+        uuid: {
             handler: function (newUid, olduid) {
                 if (newUid !== olduid) {
                     this.readFile()

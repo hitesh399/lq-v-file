@@ -22,28 +22,31 @@ export default Vue.extend({
         rules: Object,
     },
     computed: {
-        myLqForm () {
+        myLqForm() {
             return this.$refs.lqForm;
         },
-        error () {
+        formName() {
+            return 'form_' + this.id
+        },
+        fileObject: function () {
             return helper.getProp(
-               this.$store.state.form, 
-               [this.formName, 'errors', this.id],
-               false
-           );
-       },
-       formName () {
-           return 'form_' + this.id;
-       }
+                this.$store.state.form,
+                `${this.formName}.values.${this.id}`,
+                {}
+            );
+        },
+        isCropped: function () {
+            return helper.getProp(this.fileObject, 'cropped', null);
+        }
     },
-    render (h) {
+    render(h) {
         if (!this.lqForm) {
             return h(
                 'lq-form',
                 {
                     props: {
                         name: this.formName,
-                        rules: this.rules ? {[this.id]: this.rules} : undefined
+                        rules: this.rules ? { [this.id]: this.rules } : undefined
                     },
                     ref: 'lqForm'
                 },
@@ -53,13 +56,15 @@ export default Vue.extend({
         return this.genFile();
 
     },
-    data () {
-        return  {
-            uploading: false
+    data() {
+        return {
+            uploading: false,
+            file: null,
+            errorRules: []
         }
     },
     methods: {
-        genFile () {
+        genFile() {
             return this.$createElement(
                 'lq-v-file',
                 {
@@ -73,20 +78,7 @@ export default Vue.extend({
                     on: {
                         changed: (e) => {
                             const rules = this.$refs.lqfile.lqElRules
-                            if (this.thumb) {
-                                let fReader = new FileReader();
-                                this.loading = true;
-                                fReader.onload = (event) => {
-                                    setTimeout(() => {
-                                        if (!this.error && isImage(event.target.result)) {
-                                            this.$refs.lqfile.onShowCropBox(e)
-                                        }
-                                    }, 1000)
-                                   
-                                }
-                                fReader.readAsDataURL(e.file);
-                                return;
-                            }
+                            this.file = e;
                             if (!rules) {
                                 this.uploadFile()
                             }
@@ -94,10 +86,7 @@ export default Vue.extend({
                         cropped: () => {
                             this.uploadFile();
                         },
-                        'element-validated': (validateStatus) => {
-                            !validateStatus ? ( !this.thumb ? this.uploadFile() : null) : this.onLocalError(validateStatus)
-                        }
-                        
+                        'element-validated': this.whenFileValidated
                     },
                     ref: 'lqfile',
                     scopedSlots: this.$scopedSlots
@@ -106,10 +95,10 @@ export default Vue.extend({
             )
         },
         uploadFile() {
-            if (this.uploading) {return false}
+            if (this.uploading) { return false }
             this.$emit('uploading');
             this.uploading = true
-            const values = {[this.id]: this.$refs.lqfile.formatter()};
+            const values = { [this.id]: this.$refs.lqfile.formatter() };
             let form = undefined;
             if (this.otherData) {
                 form = helper.objectToFormData(this.otherData)
@@ -119,15 +108,40 @@ export default Vue.extend({
                 .then((response) => {
                     this.$emit('server-success', response)
                     this.uploading = false
+                    this.file = null
                 }).catch((error) => {
                     this.$emit('server-error', error)
                     this.$refs.lqfile.setValue(null)
                     this.uploading = false
+                    this.file = null
                 })
         },
-        onLocalError (error) {
-            this.$emit('local-error', error)
+        onLocalError(error, errorRules) {
+            this.$emit('local-error', error, errorRules)
             this.$refs.lqfile.setValue(null)
+        },
+        showCropper() {
+            if (!this.file) {
+                return;
+            }
+            let fReader = new FileReader();
+            this.loading = true;
+            fReader.onload = (event) => {
+                if (isImage(event.target.result)) {
+                    this.$refs.lqfile.onShowCropBox(this.file)
+                }
+            }
+            fReader.readAsDataURL(this.file.original);
+        },
+        whenFileValidated(errors, errorRules) {
+            this.errorRules = errorRules;
+            if (!errors && !this.thumb) {
+                this.uploadFile()
+            } else if (!errors && this.thumb && !this.isCropped) {
+                this.showCropper()
+            } else if (errors) {
+                this.onLocalError(errors, errorRules)
+            }
         }
     }
 })

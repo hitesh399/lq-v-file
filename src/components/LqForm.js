@@ -4,7 +4,7 @@ import { lqFormMixin } from 'lq-form'
 export default Vue.extend({
     name: 'lq-v-form',
     inheritAttrs: false,
-    mixins: [ lqFormMixin ],
+    mixins: [lqFormMixin],
     props: {
         tag: {
             type: String,
