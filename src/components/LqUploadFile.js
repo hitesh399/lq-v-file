@@ -24,7 +24,17 @@ export default Vue.extend({
     computed: {
         myLqForm () {
             return this.$refs.lqForm;
-        }
+        },
+        error () {
+            return helper.getProp(
+               this.$store.state.form, 
+               [this.formName, 'errors', this.id],
+               false
+           );
+       },
+       formName () {
+           return 'form_' + this.id;
+       }
     },
     render (h) {
         if (!this.lqForm) {
@@ -32,7 +42,7 @@ export default Vue.extend({
                 'lq-form',
                 {
                     props: {
-                        name: 'form_' + this.id,
+                        name: this.formName,
                         rules: this.rules ? {[this.id]: this.rules} : undefined
                     },
                     ref: 'lqForm'
@@ -50,7 +60,6 @@ export default Vue.extend({
     },
     methods: {
         genFile () {
-            console.log('this.$attrs', this.$attrs)
             return this.$createElement(
                 'lq-v-file',
                 {
@@ -68,9 +77,12 @@ export default Vue.extend({
                                 let fReader = new FileReader();
                                 this.loading = true;
                                 fReader.onload = (event) => {
-                                   if (isImage(event.target.result)) {
-                                    this.$refs.lqfile.onShowCropBox(e)
-                                   }
+                                    setTimeout(() => {
+                                        if (!this.error && isImage(event.target.result)) {
+                                            this.$refs.lqfile.onShowCropBox(e)
+                                        }
+                                    }, 1000)
+                                   
                                 }
                                 fReader.readAsDataURL(e.file);
                                 return;
@@ -114,7 +126,6 @@ export default Vue.extend({
                 })
         },
         onLocalError (error) {
-            console.log('I am done', error)
             this.$emit('local-error', error)
             this.$refs.lqfile.setValue(null)
         }

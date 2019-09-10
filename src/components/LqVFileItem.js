@@ -34,6 +34,13 @@ export default Vue.extend({
                 {}
             );
         },
+        validating () {
+            return helper.getProp(
+                this.$store.state.form, 
+                [this.lqFile.formName, 'fields', this.lqFile.id, 'validating'],
+                false
+            );
+        },
         boxHeight() {
             return this.lqFile.boxHeight ? this.lqFile.boxHeight : 100;
         },
@@ -390,6 +397,7 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.isImage  =  isImage(e.target.result) ? true : false;
+                // console.log('klsdkshdkjsdfsf')
                 if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
                     this.$emit('open-cropper', this.fileObject, this.fileIndex)
                 }
