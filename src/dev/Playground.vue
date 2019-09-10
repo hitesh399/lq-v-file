@@ -14,7 +14,6 @@
               id="my_file"
               enable-drop-zone
               show-reset-btn
-              :show-change-btn="false"
               :thumb="{width:600, height: 600}"
             />            
             <v-btn type="submit">Save</v-btn>
@@ -53,7 +52,7 @@ export default {
         my_file: {
           // presence: {allowEmpty: false},
           file: {
-              crop: true,
+              // crop: true,
               message: {
                   acceptedFiles: '^Please select only image.',
                   maxFileSize: '^Image size should be less than 1 MB.'                     

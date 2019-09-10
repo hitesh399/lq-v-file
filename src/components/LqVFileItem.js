@@ -444,7 +444,7 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.isImage = isImage(e.target.result) ? true : false;
-                // console.log('I am sjdgsjhgdhjsd T1', this.isImage, this.isCropped, showCroped , this.lqFile.thumb)
+                console.log('I am sjdgsjhgdhjsd T1', this.isImage, this.isCropped, showCroped , this.lqFile.thumb)
                 if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
 
                     if (!this.lqFile.lqElRules) {
@@ -474,6 +474,7 @@ export default Vue.extend({
         },
         whenFileValidated(errors, error_in_rules) {
             this.errorRules = error_in_rules;
+            console.log('this.canShowCropper()', this.canShowCropper(), error_in_rules)
             if (this.canShowCropper() && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
                 this.$emit('open-cropper', this.fileObject, this.fileIndex)
             }
