@@ -9,7 +9,8 @@ export default Vue.extend({
     },
     data() {
         return {
-            actionAreaWidth: 0
+            actionAreaWidth: 0,
+            cropping: false,
         }
     },
     computed: {
@@ -35,14 +36,12 @@ export default Vue.extend({
         }
     },
     updated() {
-        // console.log('CardText', this.$refs.CardText.offsetWidth)
         this.actionAreaWidth = this.$refs.CardText ? this.$refs.CardText.offsetWidth : this.lqFile.thumb.width
     },
     render(h) {
         if (!this.dialog) {
             return null;
         }
-        // console.log(this.getBoundary, 'Boundary')
         const self = this;
         return h(
             'v-dialog',
@@ -50,7 +49,7 @@ export default Vue.extend({
                 props: {
                     value: this.dialog,
                     persistent: this.lqFile.croppPopupPersistent,
-                    width: 600,
+                    width: this.lqFile.popupWidth,
                 },
                 attrs: {
                     // width: 600
@@ -60,15 +59,7 @@ export default Vue.extend({
                 h(
                     'v-card',
                     [
-                        h(
-                            'v-card-title',
-                            {
-                                class: { headline: true }
-                            },
-                            [
-                                this.genToolBar()
-                            ]
-                        ),
+                        self.genHeader(),
                         h(
                             'v-card-text',
                             [
@@ -76,7 +67,7 @@ export default Vue.extend({
                                     'div',
                                     {
                                         style: {
-                                            height: `${this.lqFile.popupHeight}px`
+                                            height: '100%'
                                         },
                                         ref: 'CardText'
                                     },
@@ -116,16 +107,20 @@ export default Vue.extend({
                                     {
                                         props: {
                                             color: 'green darken-1',
-                                            flat: true
+                                            flat: true,
+                                            disabled: self.cropping
                                         },
                                         on: {
                                             click(event) {
+                                                self.cropping = true
                                                 event.stopPropagation()
-                                                self.$refs.cropper.cropImage()
+                                                self.$refs.cropper.cropImage(() => {
+                                                    self.cropping = false
+                                                })
                                             }
                                         }
                                     },
-                                    'Crop'
+                                    self.cropping ? 'Wait' : 'Crop'
                                 ),
                                 this.genDeleteBtn()
                             ]
@@ -144,6 +139,7 @@ export default Vue.extend({
                     props: {
                         flat: true,
                         color: 'danger darken-1',
+                        disabled: self.cropping
                     },
                     on: {
                         click: function (event) {
@@ -157,9 +153,6 @@ export default Vue.extend({
             )
         },
         genToolBar() {
-            if (!this.lqFile.popupTitle) {
-                return null;
-            }
             return this.$createElement(
                 'v-toolbar',
                 {
@@ -171,6 +164,20 @@ export default Vue.extend({
                 [
 
                     this.genHeading(),
+                ]
+            )
+        },
+        genHeader() {
+            if (!this.lqFile.popupTitle) {
+                return null;
+            }
+            this.$createElement(
+                'v-card-title',
+                {
+                    class: { headline: true }
+                },
+                [
+                    this.genToolBar()
                 ]
             )
         },

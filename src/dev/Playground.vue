@@ -55,10 +55,11 @@ export default {
               // crop: true,
               message: {
                   acceptedFiles: '^Please select only image.',
-                  maxFileSize: '^Image size should be less than 1 MB.'                     
+                  maxFileSize: '^Image size should be less than 50 MB.'                     
               },
               acceptedFiles: 'image/*',
               maxFileSize: 50,
+              minImageDimensions: [600, 600]
           }
         }
       },

@@ -27,6 +27,10 @@ export default Vue.extend({
             type: Number,
             default: () => 300
         },
+        popupWidth: {
+            type: Number,
+            default: () => 400
+        },
         multiple: {
             type: Boolean,
             default: () => false
