@@ -478,9 +478,9 @@ export default Vue.extend({
                         formName: this.lqForm.name,
                         elementName: this.id,
                         value: fileval
-                    });
-                    this.validate();
+                    });                    
                 }
+                this.validate();
 
             } else {
                 this.fileObject.every((f, index) => {
