@@ -109,7 +109,7 @@ export default Vue.extend({
         cropImage: function (callBack) {
             this.getResult('original', (file, dimensions) => {
                 if (this.validateSize(dimensions.width, dimensions.height)) {
-                    this.getResult(this.lqFile.thumb, (newFile) => {
+                    this.getResult(this.lqFile.thumbSize, (newFile) => {
                         this.updateFile(newFile)
                         this.lqFile.validate();
                         this.$emit('cropped', this.fileObject, this.fileIndex);
@@ -130,25 +130,33 @@ export default Vue.extend({
         },
         getResult(size, callBack) {
             const options = {
-                type: 'blob',
+                type: 'rawcanvas',
                 size: size,
                 format: this.circle ? 'png' : this.getFileExt(this.file.name),
                 quality: 1,
                 circle: this.circle
             }
             this.$refs.croppieRef.result(options, (output) => {
-                let name = this.file.name
-                let newFile = new File([output], name, { type: this.circle ? 'png' : this.file.type })
-                let fReader = new FileReader();
-                fReader.onload = (e) => {
-                    let img = new Image();
-                    img.onload = (imgEvent) => {
-                        const imgE = imgEvent.width ? imgEvent : imgEvent.path[0];
-                        callBack(newFile, { width: imgE.width, height: imgE.height })
-                    }
-                    img.src = e.target.result;
-                }
-                fReader.readAsDataURL(newFile);
+                const name = this.file.name
+                const fileType = this.file.type
+                output.toBlob((blob) => {
+                	const newFile = new File([blob], name, {
+                        type: fileType,
+                        lastModified: Date.now()
+                    });
+                    let fReader = new FileReader();
+	                fReader.onload = (e) => {
+	                    let img = new Image();
+	                    img.onload = (imgEvent) => {
+	                        const imgE = imgEvent.width ? imgEvent : imgEvent.path[0];
+	                        callBack(newFile, { width: imgE.width, height: imgE.height })
+	                    }
+	                    img.src = e.target.result;
+	                }
+	                fReader.readAsDataURL(newFile);
+
+                }, fileType, 100)
+                
             });
         },
         getFileExt(name) {
