@@ -93,20 +93,6 @@ export default Vue.extend({
         },
         previewImage: function () {
             return this.imageRawData ? this.imageRawData : (this.uploadedFileUrl ? this.uploadedFileUrl : '')
-        },
-        viewport: function () {
-            if (!this.lqFile.thumb) {
-                return false;
-            }
-            if (this.lqFile.popupHeight <= this.lqFile.thumb.height) {
-                let newHeight = (this.lqFile.popupHeight - 20);
-                let newWidth = this.lqFile.thumb.width / this.lqFile.thumb.height * newHeight
-                return {
-                    width: newWidth,
-                    height: newHeight
-                }
-            }
-            return this.lqFile.thumb;
         }
     },
     render(h) {

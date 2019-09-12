@@ -87,10 +87,10 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.rawData = e.target.result;
-                this.initCrop()
+                this.bindCropper()
                 let img = new Image();
                 img.onload = (imgEvent) => {
-                    const imgE = imgEvent.width ? imgEvent : imgEvent.path[0];
+                    const imgE = imgEvent.srcElement ? imgEvent.srcElement : imgEvent.path[0];
                     this.orgWidth = imgE.width;
                     this.orgHeight = imgE.height;
                     this.imageLoaded = true;
@@ -99,12 +99,18 @@ export default Vue.extend({
             }
             fReader.readAsDataURL(this.file);
         },
-        initCrop: function () {
+        bindCropper: function (orientation) {
             this.$refs.croppieRef.refresh()
             this.$refs.croppieRef.bind({
                 url: this.rawData,
+                orientation
             })
             this.loading = false;
+        },
+        changeRotate(degrees) {
+            this.$refs.croppieRef.rotate(degrees)
+            const orientation = this.$refs.croppieRef.croppie.data.orientation
+            this.bindCropper(orientation)
         },
         cropImage: function (callBack) {
             this.getResult('original', (file, dimensions) => {
@@ -140,23 +146,23 @@ export default Vue.extend({
                 const name = this.file.name
                 const fileType = this.file.type
                 output.toBlob((blob) => {
-                	const newFile = new File([blob], name, {
+                    const newFile = new File([blob], name, {
                         type: fileType,
                         lastModified: Date.now()
                     });
                     let fReader = new FileReader();
-	                fReader.onload = (e) => {
-	                    let img = new Image();
-	                    img.onload = (imgEvent) => {
-	                        const imgE = imgEvent.width ? imgEvent : imgEvent.path[0];
-	                        callBack(newFile, { width: imgE.width, height: imgE.height })
-	                    }
-	                    img.src = e.target.result;
-	                }
-	                fReader.readAsDataURL(newFile);
+                    fReader.onload = (e) => {
+                        let img = new Image();
+                        img.onload = (imgEvent) => {
+                            const imgE = imgEvent.srcElement ? imgEvent.srcElement : imgEvent.path[0];
+                            callBack(newFile, { width: imgE.width, height: imgE.height })
+                        }
+                        img.src = e.target.result;
+                    }
+                    fReader.readAsDataURL(newFile);
 
                 }, fileType, 100)
-                
+
             });
         },
         getFileExt(name) {
@@ -205,9 +211,11 @@ export default Vue.extend({
                 {
                     ref: 'croppieRef',
                     props: {
+                        // enableExif: true,
                         viewport: this.viewport,
                         showZoomer: this.showZoomer,
                         enableResize: this.enableResize,
+                        enableOrientation: true,
                         ...this.$attrs
                     }
                 }

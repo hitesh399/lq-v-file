@@ -11,6 +11,7 @@ export default Vue.extend({
         return {
             actionAreaWidth: 0,
             cropping: false,
+            degrees: 0
         }
     },
     computed: {
@@ -24,18 +25,16 @@ export default Vue.extend({
             return viewPort
         },
         getBoundary() {
-            let viewPort = { ...this.lqFile.viewport };
-            if (viewPort.width > this.actionAreaWidth) {
-                const newWidth = this.actionAreaWidth
-                const aspectRatio = (this.lqFile.thumb.width / this.lqFile.thumb.height)
-                const newHeight = (newWidth / aspectRatio)
-                viewPort.height = newHeight
-                viewPort.width = newWidth
+            const newWidth = this.actionAreaWidth
+            const aspectRatio = (this.lqFile.thumb.width / this.lqFile.thumb.height)
+            const newHeight = (newWidth / aspectRatio)
+            return {
+                height: newHeight,
+                width: newWidth
             }
-            return viewPort;
         }
     },
-    updated() {
+    mounted() {
         this.actionAreaWidth = this.$refs.CardText ? this.$refs.CardText.offsetWidth : this.lqFile.thumb.width
     },
     render(h) {
@@ -102,6 +101,8 @@ export default Vue.extend({
                             'v-card-actions',
                             [
                                 h('v-spacer'),
+                                this.genRightRotateBtn('left', 'Rotate Left'),
+                                this.genRightRotateBtn('right', 'Rotate Right'),
                                 h(
                                     'v-btn',
                                     {
@@ -150,6 +151,46 @@ export default Vue.extend({
                     }
                 },
                 'Close'
+            )
+        },
+        genRightRotateBtn(moveTo = 'right', text = 'Rotate Right') {
+            const self = this;
+            if (!this.lqFile.enableRotate) return
+            return this.$createElement(
+                'v-btn',
+                {
+                    props: {
+                        icon: true,
+                        color: 'danger darken-1',
+                        disabled: self.cropping
+                    },
+                    on: {
+                        click: function (event) {
+                            event.stopPropagation()
+                            const degrees = (moveTo == 'left') ? -90 : 90;
+                            self.degrees = self.degrees + degrees;
+                            if (moveTo == 'left' && self.degrees < -360) {
+                                self.degrees = -90
+                            }
+                            if (moveTo == 'right' && self.degrees > 360) {
+                                self.degrees = 90
+                            }
+
+                            self.$refs.cropper.changeRotate(self.degrees )
+                        }
+                    }
+                },
+                [
+                    this.$createElement('v-icon',
+                        {
+                            attrs: {
+                                title: text
+                            }
+                        },
+                        moveTo === 'right' ? this.lqFile.enableRightIcon :  this.lqFile.enableLeftIcon
+                    )
+                ]
+                
             )
         },
         genToolBar() {

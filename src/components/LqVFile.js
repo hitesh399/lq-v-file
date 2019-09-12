@@ -90,6 +90,18 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
+        enableRotate: {
+            type: Boolean,
+            default: () => true
+        },
+        enableRightIcon: {
+            type: String,
+            default: () => 'fa-repeat'
+        },
+        enableLeftIcon: {
+            type: String,
+            default: () => 'fa-undo'
+        },
         deleteIcon: {
             type: String,
             default: () => 'fa-trash'
@@ -158,6 +170,10 @@ export default Vue.extend({
             type: String,
             default: () => 'v-layout'
         },
+        resetOnDelete: {
+            type: Boolean,
+            default: () => false
+        },
         layoutProps: {
             type: Object,
             default: () => {
@@ -211,21 +227,7 @@ export default Vue.extend({
                 `${this.formName}.initialize_values.${this.id}`,
                 this.multiple ? [] : null
             );
-        },
-        viewport: function () {
-            if (!this.thumb) {
-                return false;
-            }
-            if (this.popupHeight <= this.thumb.height) {
-                let newHeight = (this.popupHeight - 20);
-                let newWidth = this.thumb.width / this.thumb.height * newHeight
-                return {
-                    width: newWidth,
-                    height: newHeight
-                }
-            }
-            return this.thumb;
-        },
+        }
     },
     render(h) {
         const addBtn = [
@@ -254,14 +256,14 @@ export default Vue.extend({
                     },
                     items
                 ),
-                h(
+                this.showCropBox ? h(
                     'crop-dialog',
                     {
                         on: {
                             close: this.dialogClosedWithoutCrop
                         }
                     }
-                ),
+                ): null,
                 this.genMessages()
             ]
         )
@@ -476,7 +478,7 @@ export default Vue.extend({
         deleteFile(file) {
             if (!this.multiple) {
                 this.setValue(null)
-                if (this.fileInitializeValue) {
+                if (this.fileInitializeValue && this.resetOnDelete) {
                     const fileval = { ...this.fileInitializeValue }
                     this.$store.dispatch('form/setElementValue', {
                         formName: this.lqForm.name,

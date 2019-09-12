@@ -11,6 +11,7 @@
           <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
             <lq-v-file    
               show-view-btn
+              :enable-rotate="false"
               id="my_file"
               enable-drop-zone
               show-reset-btn
@@ -73,10 +74,10 @@ export default {
     },
     init: function() {
       this.$lqForm.initializeValues('test_form', {
-        my_file: [{
+        my_file: {
           path: 'https://tineye.com/images/widgets/mona.jpg',
           id: 1
-        }]
+        }
       })
     },
     uploading() {
