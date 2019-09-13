@@ -187,7 +187,7 @@ export default Vue.extend({
                                 title: text
                             }
                         },
-                        moveTo === 'right' ? this.lqFile.enableRightIcon :  this.lqFile.enableLeftIcon
+                        moveTo === 'right' ? this.lqFile.rotateRightIcon :  this.lqFile.rotateLeftightIcon
                     )
                 ]
                 

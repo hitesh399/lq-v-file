@@ -94,11 +94,11 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
-        enableRightIcon: {
+        rotateRightIcon: {
             type: String,
             default: () => 'fa-repeat'
         },
-        enableLeftIcon: {
+        rotateLeftIcon: {
             type: String,
             default: () => 'fa-undo'
         },
