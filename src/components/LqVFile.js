@@ -476,6 +476,10 @@ export default Vue.extend({
             }
         },
         deleteFile(file) {
+
+            if (!this.touch) {
+                this.touchStatus(true);
+            }
             if (!this.multiple) {
                 this.setValue(null)
                 if (this.fileInitializeValue && this.resetOnDelete) {
