@@ -1,6 +1,6 @@
 {
   "name": "lq-v-file",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve src/dev/index.js",
@@ -14,10 +14,9 @@
     "src/*"
   ],
   "dependencies": {
-    "@hapi/hapi": "^18.3.2",
     "core-js": "^2.6.5",
     "font-awesome": "^4.7.0",
-    "lq-form": "^0.1.79",
+    "lq-form": "^0.1.80",
     "validate.js": "^0.13.1",
     "vue": "^2.6.10",
     "vue-croppie": "^2.0.1",

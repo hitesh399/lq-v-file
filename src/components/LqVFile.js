@@ -472,7 +472,7 @@ export default Vue.extend({
                 });
             } else {
                 // console.log('I am calling Here.')
-                // this.deleteFile(file)
+                this.deleteFile(file)
             }
         },
         deleteFile(file) {
@@ -481,7 +481,7 @@ export default Vue.extend({
                 this.touchStatus(true);
             }
             if (!this.multiple) {
-                this.setValue(null)
+                this.setValue(null, false, false)
                 if (this.fileInitializeValue && this.resetOnDelete) {
                     const fileval = { ...this.fileInitializeValue }
                     this.$store.dispatch('form/setElementValue', {
