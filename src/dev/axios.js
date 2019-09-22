@@ -3,7 +3,8 @@ import axios from 'axios'
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || ''
-// axios.defaults.headers.common['Authorization'] = AUTH_TOKEN
+axios.defaults.headers.common['client-id'] = 'eyJpdiI6ImdxTDd5S0tuRmJxWndYMzNYaStqVmc9PSIsInZhbHVlIjoiWkNjY1BMaFlpV2JGMWhJQ1VKUERBZz09IiwibWFjIjoiNmQ4NDFhNjdhNDZhMTcxM2E3YmVlYzRiOTYyOTAwODllYmI4Njk1NzMwY2M1N2ZkODNhYThkOTBiOTIxYTNlMCJ9';
+axios.defaults.headers.common['device-id'] = 'ewjgfrejwghgfr';
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 let config = {
@@ -29,7 +30,7 @@ _axios.interceptors.request.use(
 _axios.interceptors.response.use(
     response => {
         // Do something with response data
-        return response
+        return response.data
     },
     error => {
         // Do something with response error

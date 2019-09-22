@@ -4,6 +4,11 @@ import LqVFileUploadItem from './LqVFileUploadItem'
 export default LqVFile.extend({
     name: 'lq-v-file-upload',
     components: { LqVFileUploadItem },
+    provide() {
+        return {
+            lqFileUpload: this
+        };
+    },
     props: {
         action: {
             type: String,
@@ -13,6 +18,12 @@ export default LqVFile.extend({
         fileName: {
             type: String,
             default: () => 'file'
+        }
+    },
+    data() {
+        return {
+
+            fileItems: []
         }
     },
     methods: {

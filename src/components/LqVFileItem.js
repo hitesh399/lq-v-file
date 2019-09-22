@@ -24,7 +24,9 @@ export default Vue.extend({
             imageRawData: '',
             hover: false,
             errorRules: [],
-            uploadedFileType: null
+            uploadedFileType: null,
+            uploading: false,
+            uploadProcess: 0,
         }
     },
 
@@ -140,7 +142,8 @@ export default Vue.extend({
                             }
                         ),
                         // self.isImage || self.uploadedFileType === 'image' ?  self.genImageItem(true) : self.genFileItem(true),
-                        this.genMessages()
+                        this.genMessages(),
+                        this.uploading ? this.genUploadProcess() : null
                     ]
                 )
             ]
@@ -169,6 +172,42 @@ export default Vue.extend({
                     )
                 ]
             )
+        },
+        genUploadProcess() {
+            return this.$createElement('v-layout', {
+                style: {
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(0, 0, 0, 0.6)'
+                },
+                
+            }, [
+                this.$createElement('v-layout', {
+                    attrs: {
+                        'align-center': true,
+                        'justify-center': true
+                    }
+                }, [
+                    this.$createElement('div', {
+                        class: {
+                            'text-xs-center': true,
+                        },
+
+                    }, [
+                        this.$createElement('v-progress-circular', {
+                            props: {
+                                rotate: 360,
+                                size: 100,
+                                width: 5,
+                                value: this.uploadProcess,
+                                color: 'teal'
+                            }
+                        }, this.uploadProcess)
+                    ])
+                ])
+            ])
+
         },
         genFileItem(hover) {
             return this.$createElement(
@@ -430,16 +469,18 @@ export default Vue.extend({
             this.loading = true;
             fReader.onload = (e) => {
                 this.isImage = isImage(e.target.result) ? true : false;
-                if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
-
-                    if (!this.lqFile.lqElRules) {
-                        this.$emit('open-cropper', this.fileObject, this.fileIndex)
-                    }
-                }
+                this.afterFileReadAction(showCroped)
                 this.loading = false;
                 this.imageRawData = e.target.result;
             }
             fReader.readAsDataURL(this.file);
+        },
+        afterFileReadAction(showCroped) {
+            if (showCroped && this.isImage && !this.isCropped && this.lqFile.thumb && this.fileIndex === undefined) {
+                if (!this.lqFile.lqElRules) {
+                    this.$emit('open-cropper', this.fileObject, this.fileIndex)
+                }
+            }
         },
         findUploadedFileType(url) {
             if (!url) {
