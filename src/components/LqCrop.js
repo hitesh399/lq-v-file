@@ -1,9 +1,7 @@
 import Vue from 'vue'
-
 export default Vue.extend({
     name: 'lq-v-crop',
     props: {
-        // target: String,
         id: String,
         fileIndex: Number,
         fileObject: {
@@ -150,6 +148,7 @@ export default Vue.extend({
                         type: fileType,
                         lastModified: Date.now()
                     });
+                    // const newFile = blob
                     let fReader = new FileReader();
                     fReader.onload = (e) => {
                         let img = new Image();
