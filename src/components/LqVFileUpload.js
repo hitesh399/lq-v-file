@@ -41,6 +41,10 @@ export default LqVFile.extend({
                         },
                         'open-window': this.handleClick,
                         'open-cropper': this.onShowCropBox
+                    },
+                    scopedSlots: {
+                        items: this.$scopedSlots.items,
+                        uploading: this.$scopedSlots.uploading
                     }
                 }
             )

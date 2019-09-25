@@ -95,11 +95,26 @@ export default Vue.extend({
         },
         previewImage: function () {
             return this.imageRawData ? this.imageRawData : (this.uploadedFileUrl ? this.uploadedFileUrl : '')
+        },
+        itemScoped() {
+            return {
+                isImage: this.isImage,
+                loading: this.loading,
+                rawData: this.imageRawData,
+                deleteFnc: () => this.$emit('delete', this.fileObject, this.fileIndex),
+                changeFnc: () => this.$emit('open-window', this.fileIndex),
+                viewFnc: () => this.viewFile,
+                resetFnc: () => this.resetFile,
+                cropFnc: () => this.openCropper,
+                canShowCropper: this.canShowCropper,
+                previewImage: this.previewImage,
+                fileObject: this.fileObject,
+                fileIndex: this.fileIndex
+            }
         }
     },
     render(h) {
         if (this.isBlank) return;
-        const self = this;
         return h(
             'div',
             {
@@ -107,7 +122,8 @@ export default Vue.extend({
                     item: true,
                     'elevation-5': true,
                     'is-error': !!this.error,
-                    ['unique-' + this.uuid]: true
+                    ['unique-' + this.uuid]: true,
+                    ...this.getCustomClass()
                 },
                 style: {
                     'min-height': `${(this.boxHeight ? this.boxHeight : 100)}px`,
@@ -131,16 +147,7 @@ export default Vue.extend({
                         },
                     },
                     [
-                        this.$createElement(
-                            'v-hover',
-                            {
-                                scopedSlots: {
-                                    default: function ({ hover }) {
-                                        return self.isImage || self.uploadedFileType === 'image' ? self.genImageItem(hover) : self.genFileItem(hover)
-                                    }
-                                }
-                            }
-                        ),
+                        this.genItemWrapper(),
                         // self.isImage || self.uploadedFileType === 'image' ?  self.genImageItem(true) : self.genFileItem(true),
                         this.genMessages(),
                         this.uploading ? this.genUploadProcess() : null
@@ -150,6 +157,26 @@ export default Vue.extend({
         )
     },
     methods: {
+        getCustomClass() {
+            return this.lqFile.itemClass ? {
+                [this.lqFile.itemClass]: true
+            } : {}
+        },
+        genItemWrapper() {
+            if (this.$scopedSlots.items) {
+                return this.$scopedSlots.items(this.itemScoped)
+            }
+            return this.$createElement(
+                'v-hover',
+                {
+                    scopedSlots: {
+                        default: ({ hover }) => {
+                            return this.isImage || this.uploadedFileType === 'image' ? this.genImageItem(hover) : this.genFileItem(hover)
+                        }
+                    }
+                }
+            )
+        },
         genImageItem(hover) {
             return this.$createElement(
                 'v-img',
@@ -174,6 +201,12 @@ export default Vue.extend({
             )
         },
         genUploadProcess() {
+            if (this.$scopedSlots.uploading) {
+                return this.$scopedSlots.items({
+                    uploadProcess: this.uploadProcess,
+                    uploading: this.uploading
+                });
+            }
             return this.$createElement('v-layout', {
                 style: {
                     position: 'absolute',
@@ -181,7 +214,7 @@ export default Vue.extend({
                     height: '100%',
                     background: 'rgba(0, 0, 0, 0.6)'
                 },
-                
+
             }, [
                 this.$createElement('v-layout', {
                     attrs: {
@@ -364,13 +397,7 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            const file = self.file;
-                            if (file) {
-                                const fileURL = URL.createObjectURL(file);
-                                window.open(fileURL, '_blank');
-                            } else {
-                                window.open(self.uploadedFileUrl, '_blank');
-                            }
+                            self.viewFile()
                         }
                     }
                 },
@@ -387,6 +414,15 @@ export default Vue.extend({
                 ]
             )
         },
+        viewFile() {
+            const file = this.file;
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                window.open(fileURL, '_blank');
+            } else {
+                window.open(this.uploadedFileUrl, '_blank');
+            }
+        },
         genResetBtn() {
             const self = this;
             if (!this.fileInitializeValue || !this.file || !this.lqFile.showResetBtn) {
@@ -401,14 +437,7 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            if (self.fileInitializeValue) {
-                                const fileval = { ...self.fileInitializeValue }
-                                self.$store.dispatch('form/setElementValue', {
-                                    formName: self.lqFile.formName,
-                                    elementName: self.fileId,
-                                    value: fileval
-                                });
-                            }
+                            self.resetFile()
                         }
                     }
                 },
@@ -425,6 +454,16 @@ export default Vue.extend({
                 ]
             )
         },
+        resetFile() {
+            if (this.fileInitializeValue) {
+                const fileval = { ...this.fileInitializeValue }
+                this.$store.dispatch('form/setElementValue', {
+                    formName: this.lqFile.formName,
+                    elementName: this.fileId,
+                    value: fileval
+                });
+            }
+        },
         genCropBtn() {
             if (!this.canShowCropper()) { return }
             const self = this;
@@ -440,7 +479,7 @@ export default Vue.extend({
                     on: {
                         click: function (event) {
                             event.stopPropagation()
-                            self.$emit('open-cropper', self.fileObject, self.fileIndex)
+                            self.openCropper()
                         }
                     }
                 },
@@ -456,6 +495,9 @@ export default Vue.extend({
                     )
                 ]
             )
+        },
+        openCropper() {
+            this.$emit('open-cropper', this.fileObject, this.fileIndex)
         },
         readFile(showCroped = true) {
             if (!this.file) {
@@ -488,7 +530,7 @@ export default Vue.extend({
                 return;
             }
 
-            var img = new Image();
+            let img = new Image();
             img.onload = (e) => {
                 if (e.type === 'load') {
                     this.uploadedFileType = 'image'

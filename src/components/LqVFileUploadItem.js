@@ -4,6 +4,26 @@ import helper from 'vuejs-object-helper'
 export default LqVFileItem.extend({
     name: 'lq-v-file-item-upload',
     inject: ['lqFileUpload'],
+    computed: {
+        itemScoped() {
+            return {
+                isImage: this.isImage,
+                loading: this.loading,
+                rawData: this.imageRawData,
+                deleteFnc: () => this.$emit('delete', this.fileObject, this.fileIndex),
+                changeFnc: () => this.$emit('open-window', this.fileIndex),
+                viewFnc: () => this.viewFile,
+                resetFnc: () => this.resetFile,
+                cropFnc: () => this.openCropper,
+                canShowCropper: this.canShowCropper,
+                previewImage: this.previewImage,
+                fileObject: this.fileObject,
+                fileIndex: this.fileIndex,
+                uploadFnc: this.uploadFile,
+                errors: this.errors
+            }
+        }
+    },
     methods: {
         async uploadFile() {
 
@@ -50,13 +70,13 @@ export default LqVFileItem.extend({
         },
         afterFileReadAction(showCroped) {
             LqVFileItem.options.methods.afterFileReadAction.call(this, showCroped)
-            if (!this.lqFile.thumb && !this.lqFile.lqElRules) {
+            if (!this.lqFile.thumb && !this.lqFile.lqElRules && this.lqFile.uploadOnChange) {
                 this.uploadFile()
             }
         },
         whenFileValidated(errors, error_in_rules) {
             LqVFileItem.options.methods.whenFileValidated.call(this, errors, error_in_rules)
-            if (!errors && this.lqFile.thumb && this.isCropped) {
+            if (!errors && this.lqFile.thumb && this.isCropped && this.lqFile.uploadOnChange) {
                 this.uploadFile()
             }
         },

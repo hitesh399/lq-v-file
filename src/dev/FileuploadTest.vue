@@ -18,8 +18,15 @@
               token-action="http://localhost/lq_server_sample/public/api/media-token"
               enable-drop-zone
               show-reset-btn
+              :upload-on-change="false"
               :thumb="{width:600, height: 600}"
-            />
+            >
+              <template v-slot:items="{rawData, fileObject, previewImage, isImage, uploadFnc, uploading}">
+                <img :src="previewImage" />
+                <v-btn :disabled="uploading" @click.stop="uploadFnc">Upload</v-btn>
+              </template>
+            </lq-v-file-upload>
+
             <v-btn type="submit">Save</v-btn>
             <v-btn type="button" @click.prevent="init">Init</v-btn>
           </lq-form>

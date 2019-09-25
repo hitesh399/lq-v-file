@@ -4,6 +4,7 @@ import helper from 'vuejs-object-helper';
 import FileItem from './LqVFileItem'
 import CropDialog from './CropDialog'
 import validate from 'validate.js'
+import { string } from 'postcss-selector-parser';
 
 export default Vue.extend({
     name: 'lq-v-file',
@@ -183,7 +184,12 @@ export default Vue.extend({
                     'fill-height': true,
                 }
             }
-        }
+        },
+        uploadOnChange: {
+            type: Boolean,
+            default: () => true
+        },
+        itemClass: string
     },
     data() {
         return {
@@ -385,6 +391,7 @@ export default Vue.extend({
             )
         },
         genFileItem(fileIndex) {
+            console.log('this.$scopedSlots', this.$scopedSlots)
             return this.$createElement(
                 'file-item',
                 {
@@ -398,6 +405,10 @@ export default Vue.extend({
                         },
                         'open-window': this.handleClick,
                         'open-cropper': this.onShowCropBox
+                    },
+                    scopedSlots: {
+                        items: this.$scopedSlots.items,
+                        uploading: this.$scopedSlots.uploading
                     }
                 }
             )
