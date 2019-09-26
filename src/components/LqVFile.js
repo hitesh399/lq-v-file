@@ -214,7 +214,7 @@ export default Vue.extend({
             return !validate.isEmpty(this.fileObject)
         },
         maxNoOfFiles: function () {
-            return this.$helper.getProp(this.lqElRules, 'file.max');
+            return helper.getProp(this.lqElRules, 'file.max');
         },
         fileObject: function () {
             return helper.getProp(

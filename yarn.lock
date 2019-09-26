@@ -9757,6 +9757,19 @@ vuejs-object-helper@^0.1.25:
     recursive-copy "^2.0.10"
     vue "^2.6.10"
 
+vuejs-object-helper@^0.1.27:
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/vuejs-object-helper/-/vuejs-object-helper-0.1.27.tgz#041fe7416015fc3a26ec43cb5929477975d64b7a"
+  integrity sha512-itPGGBihqIKln/ouAgk8llued04gZMB3nF9rW+2hp+0ZEDeTFngyYiWtrf5G7haR6vWERNO5s9SVHfaWlaaZhg==
+  dependencies:
+    "@vue/test-utils" "^1.0.0-beta.29"
+    babel-jest "^24.9.0"
+    babel-preset-env "^1.7.0"
+    babel-runtime "^6.26.0"
+    jest "^24.9.0"
+    recursive-copy "^2.0.10"
+    vue "^2.6.10"
+
 vuetify@1.5.*:
   version "1.5.18"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-1.5.18.tgz#1522d7ef7686b4473bb67b274ae8bb7bca514d13"

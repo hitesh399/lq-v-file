@@ -135,7 +135,7 @@ export default Vue.extend({
         },
         whenFileValidated(errors, errorRules) {
 
-            if (this.$helper.isObject(errorRules)) {
+            if (helper.isObject(errorRules)) {
                 let error_rules = [];
                 Object.keys(errorRules).forEach(rule => {
                     error_rules = error_rules.concat(rule)

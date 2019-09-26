@@ -1,6 +1,6 @@
 <template>
   <div>
-    <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
+    <!-- <lq-form :rules="rules" name="test_form" action="http://localhost:8080" content-type="formdata">
       <lq-v-file
         show-view-btn
         :enable-rotate="false"
@@ -11,7 +11,7 @@
       />
       <v-btn type="submit">Save</v-btn>
       <v-btn type="button" @click.prevent="init">Init</v-btn>
-    </lq-form>
+    </lq-form> -->
     <lq-single-upload-file
       id="test_file"
       action="http://localhost:8080"
@@ -24,7 +24,7 @@
       :thumb="{width:600, height: 600}"
     >
       <template v-slot:default="{openWindow, errors}">
-        <v-btn @click.prevent="openWindow">Choose file to Upload</v-btn>
+        <v-btn @click.prevent="openWindow()">Choose file to Upload</v-btn>
       </template>
     </lq-single-upload-file>
   </div>

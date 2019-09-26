@@ -3,7 +3,8 @@
     <v-container fluid grid-list-xl>
       <v-layout align-center wrap>
         <v-flex md12>
-          <FileUploadTest />
+          <!-- <FileUploadTest /> -->
+          <FileTest />
         </v-flex>
       </v-layout>
     </v-container>
@@ -11,8 +12,9 @@
 </template>
 <script>
 import FileUploadTest from "./FileuploadTest";
+import FileTest from "./FileTest";
 export default {
   name: "playground",
-  components: { FileUploadTest }
+  components: { FileUploadTest, FileTest }
 };
 </script>

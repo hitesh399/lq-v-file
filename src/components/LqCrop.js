@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import helper from 'vuejs-object-helper';
+
 export default Vue.extend({
     name: 'lq-v-crop',
     props: {
@@ -61,10 +63,10 @@ export default Vue.extend({
     },
     computed: {
         minWidth() {
-            return this.$helper.getProp(this.lqFile.lqElRules, 'file.minImageDimensions.0')
+            return helper.getProp(this.lqFile.lqElRules, 'file.minImageDimensions.0')
         },
         minHeight() {
-            return this.$helper.getProp(this.lqFile.lqElRules, 'file.minImageDimensions.1')
+            return helper.getProp(this.lqFile.lqElRules, 'file.minImageDimensions.1')
         },
     },
     created() {
@@ -151,12 +153,12 @@ export default Vue.extend({
                             lastModified: Date.now()
                         });
                     } else {
-                        let newFile = blob
+                        newFile = blob
                         Object.defineProperty(newFile, 'name', {
                             value: name,
                             writable: false
                         });
-                        Object.defineProperty(newFile, 'name', {
+                        Object.defineProperty(newFile, 'lastModified', {
                             lastModified: Date.now(),
                             writable: false
                         });

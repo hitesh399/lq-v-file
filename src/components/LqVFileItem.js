@@ -58,12 +58,12 @@ export default Vue.extend({
             let fileId = this.fileId
             let fileObjectPath = [this.lqForm.name, 'errors', fileId]
             let filePath = [this.lqForm.name, 'errors', fileId, 'file']
-            const fileObjectError = this.$helper.getProp(
+            const fileObjectError = helper.getProp(
                 this.$store.state.form,
                 fileObjectPath,
                 null
             )
-            const fileError = this.$helper.getProp(
+            const fileError = helper.getProp(
                 this.$store.state.form,
                 filePath,
                 null
