@@ -134,7 +134,17 @@ export default Vue.extend({
             fReader.readAsDataURL(this.file.original);
         },
         whenFileValidated(errors, errorRules) {
-            this.errorRules = errorRules;
+
+            if (this.$helper.isObject(errorRules)) {
+                let error_rules = [];
+                Object.keys(errorRules).forEach(rule => {
+                    error_rules = error_rules.concat(rule)
+                })
+                this.errorRules = error_rules;
+            } else {
+                this.errorRules = errorRules;
+            }
+           
             if (!errors && !this.thumb) {
                 this.uploadFile()
             } else if (!errors && this.thumb && !this.isCropped) {

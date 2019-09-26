@@ -11,3 +11,18 @@ export default {
     Vue.component('lq-v-file-upload', LqVFileUpload)
   }
 }
+
+/**
+ * Upload validation rule
+ */
+
+window.validatejs.validators = {
+  ...window.validatejs.validators,
+  upload: function (value, rules,  id, values, options) {
+    // console.log('Value', value)
+    if (value && value.file) {
+      
+      return ['Please First, upload the file.[::upload::]']
+    }
+  }
+}

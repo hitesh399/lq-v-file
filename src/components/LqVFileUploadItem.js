@@ -24,10 +24,20 @@ export default LqVFileItem.extend({
             }
         }
     },
+    data () {
+        return {
+            error_in_rules: []
+        }
+    },
     methods: {
         async uploadFile() {
 
             if (this.uploading) { return false }
+            const only_upload_error = (this.error_in_rules.length === 1 && this.error_in_rules[0] === 'upload');
+
+            if (this.error && !only_upload_error) {return false}
+
+            this.lqForm.ready(false);
             const token = await this.$axios.post(this.lqFileUpload.tokenAction, {
                 size: this.file.size,
                 name: this.file.name
@@ -48,7 +58,6 @@ export default LqVFileItem.extend({
             {
                 onUploadProgress: (progressEvent) => { 
                     this.uploadProcess = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
-                    console.log('Loaded..', this.uploadProcess)
                 }
             }).then((response) => {
                 this.$emit('server-success', response)
@@ -62,10 +71,12 @@ export default LqVFileItem.extend({
                     elementName: this.fileId,
                     value: final_data
                 });
+                this.fireWhenUploadCompleted()
 
             }).catch((error) => {
                 this.$emit('server-error', error)
                 this.uploading = false
+                this.fireWhenUploadCompleted()
             })
         },
         afterFileReadAction(showCroped) {
@@ -74,7 +85,15 @@ export default LqVFileItem.extend({
                 this.uploadFile()
             }
         },
+        async fireWhenUploadCompleted() {
+            if (!this.lqFileUpload.fileItems.some(v => v.uploading)) {
+                this.lqForm.ready(true);
+                await this.lqFileUpload.validate(true, true, false, false)
+                this.$emit('upload-completed');
+            }
+        },
         whenFileValidated(errors, error_in_rules) {
+            this.error_in_rules = error_in_rules
             LqVFileItem.options.methods.whenFileValidated.call(this, errors, error_in_rules)
             if (!errors && this.lqFile.thumb && this.isCropped && this.lqFile.uploadOnChange) {
                 this.uploadFile()

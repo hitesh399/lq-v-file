@@ -16,7 +16,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "font-awesome": "^4.7.0",
-    "lq-form": "^0.1.80",
+    "lq-form": "^0.1.86",
     "validate.js": "^0.13.1",
     "vue": "^2.6.10",
     "vue-croppie": "^2.0.1",

@@ -26,6 +26,22 @@ export default LqVFile.extend({
             fileItems: []
         }
     },
+    computed: {
+        topBottomScope() {
+            return {
+                openWindow: this.handleClick,
+                uploadFnc: this.startUploading,
+                totalItems: this.totalItems,
+                processItems: this.processItems,
+            }
+        },
+        totalItems() {
+            return this.fileItems.filter(v => v.file).length
+        },
+        processItems() {
+            return this.fileItems.filter(v => v.uploading).length
+        }
+    },
     methods: {
         genFileItem(fileIndex) {
             return this.$createElement(
@@ -40,7 +56,8 @@ export default LqVFile.extend({
                             this.onFileDelete(file, index)
                         },
                         'open-window': this.handleClick,
-                        'open-cropper': this.onShowCropBox
+                        'open-cropper': this.onShowCropBox,
+                        'upload-completed': () => { this.$emit('upload-completed') }
                     },
                     scopedSlots: {
                         items: this.$scopedSlots.items,
@@ -49,5 +66,9 @@ export default LqVFile.extend({
                 }
             )
         },
+        startUploading() {
+            this.fileItems.forEach(v => v.uploadFile())
+        },
+        
     }
 })

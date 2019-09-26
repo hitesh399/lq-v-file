@@ -17,13 +17,20 @@
               action="http://localhost/lq_server_sample/public/api/media"
               token-action="http://localhost/lq_server_sample/public/api/media-token"
               enable-drop-zone
+              multiple
               show-reset-btn
+              @upload-completed="completed"
               :upload-on-change="false"
               :thumb="{width:600, height: 600}"
             >
-              <template v-slot:items="{rawData, fileObject, previewImage, isImage, uploadFnc, uploading}">
+              <template
+                v-slot:items="{rawData, fileObject, previewImage, isImage, uploadFnc, uploading}"
+              >
                 <img :src="previewImage" />
                 <v-btn :disabled="uploading" @click.stop="uploadFnc">Upload</v-btn>
+              </template>
+              <template v-slot:top="{uploadFnc, processItems, totalItems}">
+                <v-btn @click.stop="uploadFnc">Upload to Server {{totalItems}}/{{processItems}}</v-btn>
               </template>
             </lq-v-file-upload>
 
@@ -53,11 +60,16 @@ export default {
             acceptedFiles: "image/*",
             maxFileSize: 50,
             minImageDimensions: [600, 600]
-          }
+          },
+          upload: true
         }
       }
     };
   },
-  methods: {}
+  methods: {
+    completed() {
+      console.log("Uploading completed.");
+    }
+  }
 };
 </script>

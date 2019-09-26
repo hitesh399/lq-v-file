@@ -233,6 +233,11 @@ export default Vue.extend({
                 `${this.formName}.initialize_values.${this.id}`,
                 this.multiple ? [] : null
             );
+        },
+        topBottomScope() {
+            return {
+                openWindow: this.handleClick
+            }
         }
     },
     render(h) {
@@ -254,6 +259,7 @@ export default Vue.extend({
                 }
             },
             [
+                this.$scopedSlots.top ? this.$scopedSlots.top(this.topBottomScope) : null,
                 this.genInputFile(),
                 this.$createElement(
                     this.layoutTag,
@@ -262,6 +268,7 @@ export default Vue.extend({
                     },
                     items
                 ),
+                this.$scopedSlots.bottom ? this.$scopedSlots.bottom(this.topBottomScope) : null,
                 this.showCropBox ? h(
                     'crop-dialog',
                     {
