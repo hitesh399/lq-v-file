@@ -24,21 +24,16 @@ export default LqVFileItem.extend({
             }
         }
     },
-    data () {
-        return {
-            error_in_rules: []
-        }
-    },
     methods: {
         async uploadFile() {
 
             if (this.uploading) { return false }
-            const only_upload_error = (this.error_in_rules.length === 1 && this.error_in_rules[0] === 'upload');
+            const only_upload_error = (this.errorRules.length === 1 && this.errorRules[0] === 'upload');
 
             if (this.error && !only_upload_error) {return false}
 
             this.lqForm.ready(false);
-            const token = await this.$axios.post(this.lqFileUpload.tokenAction, {
+            const token = await this.$axios.post(this.lqFileUpload.tokenUrl, {
                 size: this.file.size,
                 name: this.file.name
             })
@@ -49,12 +44,12 @@ export default LqVFileItem.extend({
         upload(token) {
             this.uploadProcess = 0
             const values = {
-                file: { file: this.file },
+                [this.lqFileUpload.fileName]: { file: this.file },
                 token
             };
             const formData = helper.objectToFormData(values)
 
-            this.$axios.post(this.lqFileUpload.action, formData, 
+            this.$axios.post(this.lqFileUpload.uploadUrl, formData, 
             {
                 onUploadProgress: (progressEvent) => { 
                     this.uploadProcess = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
@@ -93,7 +88,6 @@ export default LqVFileItem.extend({
             }
         },
         whenFileValidated(errors, error_in_rules) {
-            this.error_in_rules = error_in_rules
             LqVFileItem.options.methods.whenFileValidated.call(this, errors, error_in_rules)
             if (!errors && this.lqFile.thumb && this.isCropped && this.lqFile.uploadOnChange) {
                 this.uploadFile()
@@ -106,7 +100,7 @@ export default LqVFileItem.extend({
     beforeDestroy() {
         let index = null
         this.lqFileUpload.fileItems.every((file, i) => {
-            if ((file.id && file.id === this.file.id) || (file.uuid && file.uuid === this.file.uuid)) {
+            if (file._uid === this._uid) {
                 index = i
                 return false;
             } else {

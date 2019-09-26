@@ -552,7 +552,11 @@ export default Vue.extend({
                 !this.errorRules ||
                 this.errorRules.length === 0 ||
                 (
-                    this.errors.length === 1 && this.errorRules[0] === 'file:crop'
+                    this.errors.length === 1 && ( this.errorRules[0] === 'file:crop' || this.errorRules[0] === 'upload'  )
+                )
+                ||
+                (
+                    this.errors.length === 2 && this.errorRules.includes('file:crop') && this.errorRules.includes('upload')
                 )
             ) {
                 return true;

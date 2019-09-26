@@ -1,5 +1,6 @@
 import LqVFile from './LqVFile'
 import LqVFileUploadItem from './LqVFileUploadItem'
+import { lqFileOptions } from '../defaultOptions'
 
 export default LqVFile.extend({
     name: 'lq-v-file-upload',
@@ -10,19 +11,21 @@ export default LqVFile.extend({
         };
     },
     props: {
-        action: {
+        uploadUrl: {
             type: String,
-            required: true
+            default: () => lqFileOptions.uploadUrl
         },
-        tokenAction: String,
+        tokenUrl: {
+            type: String,
+            default: () => lqFileOptions.tokenUrl
+        },
         fileName: {
             type: String,
-            default: () => 'file'
+            default: () => lqFileOptions.uploadFileName
         }
     },
     data() {
         return {
-
             fileItems: []
         }
     },
@@ -69,6 +72,6 @@ export default LqVFile.extend({
         startUploading() {
             this.fileItems.forEach(v => v.uploadFile())
         },
-        
+
     }
 })

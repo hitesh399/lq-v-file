@@ -144,11 +144,23 @@ export default Vue.extend({
                 const name = this.file.name
                 const fileType = this.file.type
                 output.toBlob((blob) => {
-                    const newFile = new File([blob], name, {
-                        type: fileType,
-                        lastModified: Date.now()
-                    });
-                    // const newFile = blob
+                    let newFile = null;
+                    if (typeof File === 'function') {
+                        newFile = new File([blob], name, {
+                            type: fileType,
+                            lastModified: Date.now()
+                        });
+                    } else {
+                        let newFile = blob
+                        Object.defineProperty(newFile, 'name', {
+                            value: name,
+                            writable: false
+                        });
+                        Object.defineProperty(newFile, 'name', {
+                            lastModified: Date.now(),
+                            writable: false
+                        });
+                    }
                     let fReader = new FileReader();
                     fReader.onload = (e) => {
                         let img = new Image();

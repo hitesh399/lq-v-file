@@ -4,7 +4,7 @@ import helper from 'vuejs-object-helper';
 import FileItem from './LqVFileItem'
 import CropDialog from './CropDialog'
 import validate from 'validate.js'
-import { string } from 'postcss-selector-parser';
+import { lqFileOptions } from '../defaultOptions'
 
 export default Vue.extend({
     name: 'lq-v-file',
@@ -24,13 +24,9 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
-        popupHeight: {
-            type: Number,
-            default: () => 300
-        },
         popupWidth: {
             type: Number,
-            default: () => 400
+            default: () => lqFileOptions.cropperPopupWidth
         },
         multiple: {
             type: Boolean,
@@ -97,51 +93,51 @@ export default Vue.extend({
         },
         rotateRightIcon: {
             type: String,
-            default: () => 'fa-repeat'
+            default: () => lqFileOptions.rotateRightIcon
         },
         rotateLeftIcon: {
             type: String,
-            default: () => 'fa-undo'
+            default: () => lqFileOptions.rotateLeftIcon
         },
         deleteIcon: {
             type: String,
-            default: () => 'fa-trash'
+            default: () => lqFileOptions.deleteIcon
         },
         changeIcon: {
             type: String,
-            default: () => 'fa-file'
+            default: () => lqFileOptions.changeIcon
         },
         cropIcon: {
             type: String,
-            default: () => 'fa-crop'
+            default: () => lqFileOptions.cropIcon
         },
         addIcon: {
             type: String,
-            default: () => 'fa-plus'
+            default: () => lqFileOptions.addIcon
         },
         viewIcon: {
             type: String,
-            default: () => 'fa-eye'
+            default: () => lqFileOptions.viewIcon
         },
         deleteIconTitle: {
             type: String,
-            default: () => 'Delete'
+            default: () => lqFileOptions.deleteIconTitle
         },
         changeIconTitle: {
             type: String,
-            default: () => 'Change'
+            default: () => lqFileOptions.changeIconTitle
         },
         cropIconTitle: {
             type: String,
-            default: () => 'Crop'
+            default: () => lqFileOptions.cropIconTitle
         },
         addIconTitle: {
             type: String,
-            default: () => 'Add'
+            default: () => lqFileOptions.addIconTitle
         },
         viewIconTitle: {
             type: String,
-            default: () => 'View'
+            default: () => lqFileOptions.viewIconTitle
         },
         showViewBtn: {
             type: Boolean,
@@ -153,7 +149,7 @@ export default Vue.extend({
         },
         resetIconTitle: {
             type: String,
-            default: () => 'Rest'
+            default: () => lqFileOptions.resetIconTitle
         },
         showResetBtn: {
             type: Boolean,
@@ -165,7 +161,7 @@ export default Vue.extend({
         },
         resetIcon: {
             type: String,
-            default: () => 'fa-refresh'
+            default: () => lqFileOptions.resetIcon
         },
         layoutTag: {
             type: String,
@@ -189,7 +185,7 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
-        itemClass: string
+        itemClass: String
     },
     data() {
         return {
@@ -398,7 +394,6 @@ export default Vue.extend({
             )
         },
         genFileItem(fileIndex) {
-            console.log('this.$scopedSlots', this.$scopedSlots)
             return this.$createElement(
                 'file-item',
                 {
