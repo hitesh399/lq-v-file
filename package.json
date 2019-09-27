@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve src/dev/index.js",
     "build-bundle": "vue-cli-service build --target lib --name lq.vfile src/main.js",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build src/dev/index.js",
     "lint": "vue-cli-service lint"
   },
   "main": "dist/lq.vfile.umd.js",
@@ -16,7 +16,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "font-awesome": "^4.7.0",
-    "lq-form": "^0.1.86",
+    "lq-form": "^0.1.87",
     "validate.js": "^0.13.1",
     "vue": "^2.6.10",
     "vue-croppie": "^2.0.1",
