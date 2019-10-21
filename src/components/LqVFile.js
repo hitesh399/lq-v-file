@@ -237,6 +237,7 @@ export default Vue.extend({
         }
     },
     render(h) {
+        if (!this.isShow) return null;
         const addBtn = [
             this.showAddBtn || !this.showSelectedFile ? this.renderDefaultSlot() : null
         ];
@@ -350,7 +351,7 @@ export default Vue.extend({
                     style: {
                         'min-height': `${(this.boxHeight ? this.boxHeight : 100)}px`,
                         'height': '100%',
-                        cursor: !this.disabled ? 'pointer' : 'inherit'
+                        cursor: !this.isDisabled ? 'pointer' : 'inherit'
                     },
                     class: {
                         item: true,
@@ -455,7 +456,7 @@ export default Vue.extend({
             }
         },
         handleClick(fileIndex) {
-            if (!this.disabled) {
+            if (!this.isDisabled) {
                 this.openBrowser = true;
                 if (fileIndex !== undefined) {
                     this.fileIndexTochange = fileIndex
