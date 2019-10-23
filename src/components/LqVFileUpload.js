@@ -80,6 +80,14 @@ export default LqVFile.extend({
         startUploading() {
             this.fileItems.forEach(v => v.uploadFile())
         },
-
+        handleClick(fileIndex) {
+            if (!this.multiple && this.processItems >= 1) { return }
+            LqVFile.options.methods.handleClick.call(this, fileIndex)
+        },
+        onDrag(e) {
+            // e.preventDefault();
+            if (!this.multiple && this.processItems >= 1) { return }
+            LqVFile.options.methods.onDrag.call(this, e)
+        }
     }
 })

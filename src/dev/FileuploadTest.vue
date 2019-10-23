@@ -15,7 +15,7 @@
               :enable-rotate="false"
               id="my_file"
               enable-drop-zone
-              multiple
+              :multiple="false"
               show-reset-btn
               @upload-completed="completed"
               
