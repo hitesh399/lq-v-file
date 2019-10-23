@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || ''
-axios.defaults.headers.common['client-id'] = 'eyJpdiI6ImdxTDd5S0tuRmJxWndYMzNYaStqVmc9PSIsInZhbHVlIjoiWkNjY1BMaFlpV2JGMWhJQ1VKUERBZz09IiwibWFjIjoiNmQ4NDFhNjdhNDZhMTcxM2E3YmVlYzRiOTYyOTAwODllYmI4Njk1NzMwY2M1N2ZkODNhYThkOTBiOTIxYTNlMCJ9';
+axios.defaults.headers.common['client-id'] = 'eyJpdiI6ImdiOEZMR0FKTEF6ZTJQYXFIY2NSdnc9PSIsInZhbHVlIjoiaTdnN0traXRuM2QyMTFJVWppYkQzUT09IiwibWFjIjoiYjRlNDQxYmVlMGYwZWQ1MzY3YzAxOTkxNDI2NTAwMjVmNjc2YTM5NzliMGQ3YmJmZGEzYjRiZWRhYTY4YzY3ZSJ9';
 axios.defaults.headers.common['device-id'] = 'ewjgfrejwghgfr';
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 

@@ -25,21 +25,29 @@ export default LqVFileItem.extend({
         }
     },
     methods: {
-        async uploadFile() {
-
-            if (this.uploading) { return false }
-            const only_upload_error = (this.errorRules.length === 1 && this.errorRules[0] === 'upload');
-
-            if (this.error && !only_upload_error) {return false}
-
-            this.lqForm.ready(false);
-            const token = await this.$axios.post(this.lqFileUpload.tokenUrl, {
-                size: this.file.size,
-                name: this.file.name
-            })
-            this.uploading = true
-            this.upload(token.data.media_token.token)
-
+        uploadFile() {
+            let fnc = this.lqFileUpload.uploadFnc;
+            if (typeof fnc === 'function') {
+                fnc.call(this)
+            } else {
+                throw Error('Upload function is Required.')
+            }
+        },
+        async generateToken() {
+            try {
+                this.lqForm.ready(false);
+                this.uploading = true
+                return await this.$axios.post(
+                    this.lqFileUpload.tokenUrl,
+                    {
+                        size: this.file.size,
+                        name: this.file.name
+                    }
+                )
+            }
+            catch(err) {
+                this.afterUploadFail(err)
+            }
         },
         upload(token) {
             this.uploadProcess = 0
@@ -48,31 +56,43 @@ export default LqVFileItem.extend({
                 token
             };
             const formData = helper.objectToFormData(values)
+            return this.uploadFileOnServer(formData)
+        },
+        uploadFileOnServer(formData) {
+            this.uploading = true
+            return this.$axios.post(this.lqFileUpload.uploadUrl, formData,
+                {
+                    onUploadProgress: (progressEvent) => {
+                        this.uploadProcess = parseInt(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+                    }
+                }).then((response) => {
+                    this.afterUploadSuccess(response)
 
-            this.$axios.post(this.lqFileUpload.uploadUrl, formData, 
-            {
-                onUploadProgress: (progressEvent) => { 
-                    this.uploadProcess = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
-                }
-            }).then((response) => {
-                this.$emit('server-success', response)
-                let final_data = { ...this.fileObject, ...response.data.media }
-                delete final_data.file
-                delete final_data.original
-                delete final_data.uid
-                this.uploading = false
-                this.$store.dispatch('form/setElementValue', {
-                    formName: this.lqFileUpload.lqForm.name,
-                    elementName: this.fileId,
-                    value: final_data
-                });
-                this.fireWhenUploadCompleted()
-
-            }).catch((error) => {
-                this.$emit('server-error', error)
-                this.uploading = false
-                this.fireWhenUploadCompleted()
-            })
+                }).catch((error) => {
+                    this.afterUploadFail(error)
+                })
+        },
+        afterUploadFail(error) {
+            this.$emit('server-error', error)
+            this.uploading = false
+            this.fireWhenUploadCompleted()
+        },
+        afterUploadSuccess(response) {
+            this.$emit('server-success', response)
+            let final_data = {
+                ...this.fileObject,
+                ...helper.getProp(response, this.lqFileUpload.uploadResponseKey)
+            }
+            delete final_data.file
+            delete final_data.original
+            delete final_data.uid
+            this.uploading = false
+            this.$store.dispatch('form/setElementValue', {
+                formName: this.lqFileUpload.lqForm.name,
+                elementName: this.fileId,
+                value: final_data
+            });
+            this.fireWhenUploadCompleted()
         },
         afterFileReadAction(showCroped) {
             LqVFileItem.options.methods.afterFileReadAction.call(this, showCroped)
@@ -89,10 +109,16 @@ export default LqVFileItem.extend({
         },
         whenFileValidated(errors, error_in_rules) {
             LqVFileItem.options.methods.whenFileValidated.call(this, errors, error_in_rules)
-            if (!errors && this.lqFile.thumb && this.isCropped && this.lqFile.uploadOnChange) {
+            if (
+                (!errors || this.isOnlyUploadError())
+                && (!this.lqFile.thumb || (this.lqFile.thumb && this.isCropped))
+                && this.lqFile.uploadOnChange) {
                 this.uploadFile()
             }
         },
+        isOnlyUploadError() {
+            return (this.errorRules.length === 1 && this.errorRules[0] === 'upload');
+        }
     },
     created() {
         this.lqFileUpload.fileItems.push(this)

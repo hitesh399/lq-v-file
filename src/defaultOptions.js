@@ -1,4 +1,4 @@
-const lqFileOptions =  {
+const lqFileOptions = {
     options: {
         cropperPopupWidth: 400,
         rotateRightIcon: 'fa-repeat',
@@ -17,10 +17,38 @@ const lqFileOptions =  {
         resetIcon: 'fa-refresh',
         uploadUrl: 'http://localhost/lq_server_sample/public/api/media',
         tokenUrl: 'http://localhost/lq_server_sample/public/api/media-token',
-        uploadFileName: 'file'
+        uploadFileName: 'file',
+        uploadResponseKey: 'data.media',
+        formatterFnc: function () {
+            let fileObject = !this.multiple && this.fileObject ? [this.fileObject] : this.fileObject;
+            if (!fileObject) return
+            let outPut = fileObject.map(f => {
+                return {
+                    file: f.file ? f.file : '',
+                    id: f.id ? f.id : '',
+                }
+            });
+            return !this.multiple && outPut ? outPut[0] : outPut;
+        },
+        uploadFnc: async function () {
+            if (this.uploading) { return false }
+            if (this.error && !this.isOnlyUploadError()) { return false }
+            const token = await this.generateToken()
+            this.upload(token.data.media_token.token)
+
+        }
     },
     get uploadUrl() {
         return this.options.uploadUrl
+    },
+    get formatterFnc() {
+        return this.options.formatterFnc
+    },
+    get uploadResponseKey() {
+        return this.options.uploadResponseKey
+    },
+    get uploadFnc() {
+        return this.options.uploadFnc
     },
     get uploadFileName() {
         return this.options.uploadFileName
@@ -76,10 +104,21 @@ const lqFileOptions =  {
     merge: function (options) {
         this.options = {
             ...this.options,
-            ...options
+            ...this.extractOptions(options)
         }
+    },
+    extractOptions(attrs) {
+        const option_keys = Object.keys(this.options)
+        let data = {}
+        option_keys.forEach(k => {
+            const val = attrs[k]
+            if (val !== undefined) {
+                data[k] = val
+            }
+        })
+        return data;
     }
 }
 
 // const lqFileOptions =  optionsFnc();
-export {lqFileOptions}
+export { lqFileOptions }

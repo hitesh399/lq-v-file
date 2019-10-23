@@ -14,7 +14,7 @@
     </lq-form> -->
     <lq-single-upload-file
       id="test_file"
-      action="http://localhost:8080"
+      action="http://localhost/lq_server_sample/public/api/login"
       @uploading="uploading"
       @local-error="error"
       @server-error="error"

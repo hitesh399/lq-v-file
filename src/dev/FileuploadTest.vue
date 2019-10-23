@@ -18,7 +18,7 @@
               multiple
               show-reset-btn
               @upload-completed="completed"
-              :upload-on-change="false"
+              
               :thumb="{width:600, height: 600}"
             >
               <!-- <template
@@ -57,7 +57,7 @@ export default {
             },
             acceptedFiles: "image/*",
             maxFileSize: 50,
-            // crop: true,
+            crop: true,
             minImageDimensions: [600, 600]
           },
           upload: {

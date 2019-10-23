@@ -101,8 +101,8 @@ export default Vue.extend({
                             'v-card-actions',
                             [
                                 h('v-spacer'),
-                                this.genRightRotateBtn('left', 'Rotate Left'),
-                                this.genRightRotateBtn('right', 'Rotate Right'),
+                                this.genRotateBtn('left', 'Rotate Left'),
+                                this.genRotateBtn('right', 'Rotate Right'),
                                 h(
                                     'v-btn',
                                     {
@@ -153,7 +153,7 @@ export default Vue.extend({
                 'Close'
             )
         },
-        genRightRotateBtn(moveTo = 'right', text = 'Rotate Right') {
+        genRotateBtn(moveTo = 'right', text = 'Rotate Right') {
             const self = this;
             if (!this.lqFile.enableRotate) return
             return this.$createElement(
@@ -161,7 +161,6 @@ export default Vue.extend({
                 {
                     props: {
                         icon: true,
-                        color: 'danger darken-1',
                         disabled: self.cropping
                     },
                     on: {

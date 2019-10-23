@@ -139,6 +139,10 @@ export default Vue.extend({
             type: String,
             default: () => lqFileOptions.viewIconTitle
         },
+        formatterFnc: {
+            type: Function,
+            default: lqFileOptions.formatterFnc
+        },
         showViewBtn: {
             type: Boolean,
             default: () => false
@@ -273,7 +277,7 @@ export default Vue.extend({
                             close: this.dialogClosedWithoutCrop
                         }
                     }
-                ): null,
+                ) : null,
                 this.genMessages()
             ]
         )
@@ -423,15 +427,12 @@ export default Vue.extend({
             this.openBrowser = false;
         },
         formatter() {
-            let fileObject = !this.multiple && this.fileObject ? [this.fileObject] : this.fileObject;
-            if (!fileObject) return
-            let outPut = fileObject.map(f => {
-                return {
-                    file: f.file ? f.file : '',
-                    id: f.id ? f.id : '',
-                }
-            });
-            return !this.multiple && outPut ? outPut[0] : outPut;
+            let fnc = this.formatterFnc;
+            if (typeof fnc === 'function') {
+                return fnc.call(this)
+            } else {
+                throw Error('formatter function is Required.')
+            }
         },
         clickOnInputFile() {
             document.body.onfocus = this.checkIt;
@@ -502,7 +503,7 @@ export default Vue.extend({
                         formName: this.lqForm.name,
                         elementName: this.id,
                         value: fileval
-                    });                    
+                    });
                 }
                 this.validate();
 
