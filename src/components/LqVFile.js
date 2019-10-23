@@ -298,7 +298,6 @@ export default Vue.extend({
             }
         },
         onDrag(e) {
-            console.log('shdksd', e)
             e.preventDefault();
             if (!e.dataTransfer.files || !this.enableDropZone) {
                 return;
