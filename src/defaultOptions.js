@@ -13,24 +13,27 @@ const lqFileOptions = {
         cropIconTitle: 'Crop',
         addIconTitle: 'Add',
         viewIconTitle: 'View',
+        primaryKey: 'id',
         resetIconTitle: 'Reset',
         resetIcon: 'fa-refresh',
         uploadUrl: 'http://localhost/lq_server_sample/public/api/media',
         tokenUrl: 'http://localhost/lq_server_sample/public/api/media-token',
         uploadFileName: 'file',
         uploadResponseKey: 'data.media',
-        formatterFnc: function () {
+        formatterFnc: function (onlyPrimary = false) {
             let fileObject = !this.multiple && this.fileObject ? [this.fileObject] : this.fileObject;
             if (!fileObject) return
             let outPut = fileObject.map(f => {
-                return {
+                const primaryVal = f[this.primaryKey] ? f[this.primaryKey] : ''
+                return onlyPrimary ? primaryVal : {
                     file: f.file ? f.file : '',
-                    id: f.id ? f.id : '',
+                    [this.primaryKey]: primaryVal,
                 }
             });
             return !this.multiple && outPut ? outPut[0] : outPut;
         },
         uploadFnc: async function () {
+            // console.log('I am ok.')
             if (this.uploading) { return false }
             if (this.error && !this.isOnlyUploadError()) { return false }
             const token = await this.generateToken()
@@ -40,6 +43,9 @@ const lqFileOptions = {
     },
     get uploadUrl() {
         return this.options.uploadUrl
+    },
+    get primaryKey() {
+        return this.options.primaryKey
     },
     get formatterFnc() {
         return this.options.formatterFnc

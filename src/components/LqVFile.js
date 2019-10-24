@@ -167,6 +167,10 @@ export default Vue.extend({
             type: String,
             default: () => lqFileOptions.resetIcon
         },
+        primaryKey: {
+            type: String,
+            default: () => lqFileOptions.primaryKey
+        },
         layoutTag: {
             type: String,
             default: () => 'v-layout'
@@ -421,7 +425,15 @@ export default Vue.extend({
             )
         },
         fileChanged(event) {
+            const id = helper.isObject(this.fileObject) ? helper.getProp(this.fileObject, this.primaryKey, null) : null
             this.handleFileChange(event, this.fileIndexTochange);
+            if (id) {
+                this.$store.dispatch('form/setElementValue', {
+                    formName: this.lqForm.name,
+                    elementName: `${this.id}.${this.primaryKey}`,
+                    value: id
+                });
+            }
             this.fileIndexTochange = undefined
             this.inputFileMultiple = this.multiple
             this.openBrowser = false;

@@ -45,15 +45,17 @@ export default LqVFileItem.extend({
                     }
                 )
             }
-            catch(err) {
+            catch (err) {
                 this.afterUploadFail(err)
             }
         },
         upload(token) {
+            this.lqForm.ready(false);
             this.uploadProcess = 0
             const values = {
                 [this.lqFileUpload.fileName]: { file: this.file },
-                token
+                token,
+                [this.lqFileUpload.primaryKey]: helper.getProp(this.fileObject, this.lqFileUpload.primaryKey, null)
             };
             const formData = helper.objectToFormData(values)
             return this.uploadFileOnServer(formData)

@@ -8,14 +8,13 @@
             :rules="rules"
             name="test_form"
             action="http://localhost:8080"
-            content-type="formdata"
           >
             <lq-v-file-upload
               show-view-btn
-              :enable-rotate="false"
+              enable-rotate
               id="my_file"
               enable-drop-zone
-              :multiple="false"
+              multiple
               show-reset-btn
               @upload-completed="completed"
               

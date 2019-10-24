@@ -3,8 +3,8 @@
     <v-container fluid grid-list-xl>
       <v-layout align-center wrap>
         <v-flex md12>
-          <FileUploadTest />
-          <!-- <FileTest /> -->
+          <!-- <FileUploadTest /> -->
+          <FileTest />
         </v-flex>
       </v-layout>
     </v-container>

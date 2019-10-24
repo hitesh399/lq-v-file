@@ -88,6 +88,14 @@ export default LqVFile.extend({
             // e.preventDefault();
             if (!this.multiple && this.processItems >= 1) { return }
             LqVFile.options.methods.onDrag.call(this, e)
-        }
+        },
+        formatter() {
+            let fnc = this.formatterFnc;
+            if (typeof fnc === 'function') {
+                return fnc.call(this, true)
+            } else {
+                throw Error('formatter function is Required.')
+            }
+        },
     }
 })
