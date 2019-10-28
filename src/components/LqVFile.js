@@ -193,7 +193,13 @@ export default Vue.extend({
             type: Boolean,
             default: () => true
         },
-        itemClass: String
+        itemClass: [String, Array],
+        wrapperClass: String,
+        rowClass: Array,
+        clickEveryWhere: {
+            type: Boolean,
+            default: () => false
+        }
     },
     data() {
         return {
@@ -247,7 +253,7 @@ export default Vue.extend({
     render(h) {
         if (!this.isShow) return null;
         const addBtn = [
-            this.showAddBtn || !this.showSelectedFile ? this.renderDefaultSlot() : null
+            this.showAddBtn && this.showSelector ? this.renderDefaultSlot() : null
         ];
         const fileItems = this.renderItems();
         const items = this.itemLocation === 'prepend' ? fileItems.concat(addBtn) : addBtn.concat(fileItems)
@@ -256,11 +262,13 @@ export default Vue.extend({
             'div',
             {
                 class: {
-                    'has-errors': this.errors && this.errors.length ? true : false
+                    'has-errors': this.errors && this.errors.length ? true : false,
+                    [this.wrapperClass] : this.wrapperClass ? true: false
                 },
                 on: {
                     dragover: (e) => { e.preventDefault(); },
-                    drop: this.onDrag
+                    drop: this.onDrag,
+                    click: this.clickOnWrapper
                 }
             },
             [
@@ -269,7 +277,8 @@ export default Vue.extend({
                 this.$createElement(
                     this.layoutTag,
                     {
-                        attrs: this.layoutProps
+                        attrs: this.layoutProps,
+                        class: this.rowClass
                     },
                     items
                 ),
@@ -307,6 +316,14 @@ export default Vue.extend({
                 return;
             }
             this.fileChanged({ target: e.dataTransfer })
+        },
+        clickOnWrapper(e) {
+            e.stopPropagation();
+            if (this.clickEveryWhere) {
+                this.handleClick()
+            } else {
+                return;
+            }
         },
         renderDefaultSlot() {
             if (this.$scopedSlots.default) {

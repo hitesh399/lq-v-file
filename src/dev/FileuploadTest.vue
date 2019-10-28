@@ -5,7 +5,6 @@
         <v-flex md12>
           File Upload Test
           <lq-form
-            :rules="rules"
             name="test_form"
             action="http://localhost:8080"
           >

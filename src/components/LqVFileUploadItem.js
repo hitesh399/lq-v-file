@@ -98,7 +98,7 @@ export default LqVFileItem.extend({
         },
         afterFileReadAction(showCroped) {
             LqVFileItem.options.methods.afterFileReadAction.call(this, showCroped)
-            if (!this.lqFile.thumb && !this.lqFile.lqElRules && this.lqFile.uploadOnChange) {
+            if (( !this.lqFile.thumb || (this.lqFile.thumb  && this.isCropped) ) && !this.lqFile.lqElRules && this.lqFile.uploadOnChange) {
                 this.uploadFile()
             }
         },
