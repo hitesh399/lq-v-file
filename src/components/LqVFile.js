@@ -44,9 +44,9 @@ export default Vue.extend({
             type: Object,
             required: false
         },
-        showSelector: {
+        allwaysShowSelector: {
             type: Boolean,
-            default: () => true
+            default: () => false
         },
         popupTitle: String,
         aspectRatio: {
@@ -253,7 +253,7 @@ export default Vue.extend({
     render(h) {
         if (!this.isShow) return null;
         const addBtn = [
-            this.showAddBtn && this.showSelector ? this.renderDefaultSlot() : null
+            this.showAddBtn || this.allwaysShowSelector ? this.renderDefaultSlot() : null
         ];
         const fileItems = this.renderItems();
         const items = this.itemLocation === 'prepend' ? fileItems.concat(addBtn) : addBtn.concat(fileItems)
