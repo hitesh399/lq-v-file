@@ -41,7 +41,8 @@ export default LqVFileItem.extend({
                     this.lqFileUpload.tokenUrl,
                     {
                         size: this.file.size,
-                        name: this.file.name
+                        name: this.file.name,
+                        path: this.lqFileUpload.uploadPath,
                     }
                 )
             }

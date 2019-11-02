@@ -27,6 +27,10 @@ export default LqVFile.extend({
             type: Function,
             default: lqFileOptions.uploadFnc
         },
+        uploadPath: {
+            type: String,
+            default: () => ''
+        },
         uploadResponseKey: {
             type: String,
             default: () => lqFileOptions.uploadResponseKey
