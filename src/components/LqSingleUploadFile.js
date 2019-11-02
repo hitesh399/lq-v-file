@@ -35,6 +35,9 @@ export default Vue.extend({
                 {}
             );
         },
+        _file: function () {
+            return this.fileObject && this.fileObject.file ? this.fileObject.file : null;
+        },
         isCropped: function () {
             return helper.getProp(this.fileObject, 'cropped', null);
         }
@@ -121,7 +124,7 @@ export default Vue.extend({
             this.$refs.lqfile.setValue(null)
         },
         showCropper() {
-            if (!this.file) {
+            if (!this._file) {
                 return;
             }
             let fReader = new FileReader();
