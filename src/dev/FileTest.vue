@@ -41,7 +41,7 @@ export default {
         my_file: {
           // presence: {allowEmpty: false},
           file: {
-            // crop: true,
+            crop: true,
             message: {
               acceptedFiles: "^Please select only image.",
               maxFileSize: "^Image size should be less than 50 MB."

@@ -74,6 +74,7 @@ export default Vue.extend({
                     props: {
                         id: this.id,
                         showSelectedFile: false,
+                        allwaysShowSelector: true,
                         thumb: this.thumb,
                         ...this.$attrs,
                         multiple: false
@@ -136,21 +137,24 @@ export default Vue.extend({
             }
             fReader.readAsDataURL(this.file.original);
         },
-        whenFileValidated(errors, errorRules) {
-
+        whenFileValidated(errors, _errorRules) {
+            const rules = this.$refs.lqfile.lqElRules
+            const errorRules = _errorRules && _errorRules[0] ? _errorRules[0] : {}
             if (helper.isObject(errorRules)) {
                 let error_rules = [];
                 Object.keys(errorRules).forEach(rule => {
-                    error_rules = error_rules.concat(rule)
+                    error_rules = error_rules.concat(errorRules[rule])
                 })
                 this.errorRules = error_rules;
             } else {
                 this.errorRules = errorRules;
             }
-           
+
+            const _showCropper = helper.getProp(rules, 'file.crop') && this.errorRules.length === 1 && this.errorRules[0] === 'file:crop'
+
             if (!errors && !this.thumb) {
                 this.uploadFile()
-            } else if (!errors && this.thumb && !this.isCropped) {
+            } else if (!errors && this.thumb && !this.isCropped || _showCropper) {
                 this.showCropper()
             } else if (errors) {
                 this.onLocalError(errors, errorRules)

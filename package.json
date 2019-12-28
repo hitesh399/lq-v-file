@@ -1,6 +1,6 @@
 {
   "name": "lq-v-file",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve src/dev/index.js",
@@ -28,7 +28,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "font-awesome": "^4.7.0",
-    "lq-form": "^0.1.100",
+    "lq-form": "^0.1.106",
     "validate.js": "^0.13.1",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10",

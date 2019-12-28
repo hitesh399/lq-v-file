@@ -5368,10 +5368,10 @@ lower-case@^1.1.1:
   resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-1.1.4.tgz#9a2cabd1b9e8e0ae993a4bf7d5875c39c42e8eac"
   integrity sha1-miyr0bno4K6ZOkv31YdcOcQujqw=
 
-lq-form@^0.1.100:
-  version "0.1.100"
-  resolved "https://registry.yarnpkg.com/lq-form/-/lq-form-0.1.100.tgz#65005e499907a5bfc87afb7730a265493d114d2a"
-  integrity sha512-koDBYHPKQd4IlixJV5LKn8POgspzzf416HKYJEX556u6jWP5BDS3MPFX6RIGzsJst8Nu97w8nw1q/R6ODrtXGA==
+lq-form@^0.1.106:
+  version "0.1.106"
+  resolved "https://registry.yarnpkg.com/lq-form/-/lq-form-0.1.106.tgz#aa6603cca129dc78297971edfedf7fb8823582ff"
+  integrity sha512-yJMihL4y5l+jqupyQNvcfah6FRuz0oljF/aTGSrkTnY6Znm2JiA54adwVulpnGE5+ZfsvmQdO4QWUxrjXmfVcA==
   dependencies:
     lodash "^4.17.14"
     validate.js "^0.12.0"
