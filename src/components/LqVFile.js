@@ -263,7 +263,7 @@ export default Vue.extend({
             {
                 class: {
                     'has-errors': this.errors && this.errors.length ? true : false,
-                    [this.wrapperClass] : this.wrapperClass ? true: false
+                    [this.wrapperClass]: this.wrapperClass ? true : false
                 },
                 on: {
                     dragover: (e) => { e.preventDefault(); },
@@ -538,9 +538,9 @@ export default Vue.extend({
 
             } else {
                 this.fileObject.every((f, index) => {
-                    if ((f.id && f.id === file.id) || f.uid === file.uid) {
+                    if ((f.id && f.id === file.id) || (!f.id && f.uid === file.uid)) {
                         this.remove(this.id + '.' + index);
-                        return;
+                        return false;
                     } else {
                         return true;
                     }
